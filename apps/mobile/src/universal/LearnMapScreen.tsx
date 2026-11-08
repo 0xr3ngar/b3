@@ -5,6 +5,8 @@ import {
   type LearnStartInput,
   type LearnStationState,
 } from "@t3tools/contracts";
+import { OTHER_LINE_ID } from "@t3tools/universal-learn/transit";
+import { planRoute } from "@t3tools/universal-learn/mapModel";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,21 +18,14 @@ import { Button } from "../components/ui/Button";
 import { ScreenScrollView as ScrollView } from "../components/ui/ScreenScrollView";
 import { useAppearancePreferences } from "../features/settings/appearance/AppearancePreferencesProvider";
 import { useSelectWorkspaceDetail } from "../features/layout/workspace/useSelectWorkspaceDetail";
-import type { MobileThemeVariable, MobileThemeVariables } from "../lib/mobileTheme";
+import type { MobileThemeVariables } from "../lib/mobileTheme";
 import { useEnvironmentQuery } from "../state/query";
 import { useAtomCommand } from "../state/use-atom-command";
+import { learnLineColor } from "./learnColors";
 import { StationGlyph } from "./StationGlyph";
+import { TransitMap, type MapFocus } from "./TransitMap";
 import { universal } from "./state";
 import { useSpaceEnvironmentId } from "./useSpace";
-
-const LINE_COLOR: Record<string, MobileThemeVariable> = {
-  primary: "--color-primary",
-  success: "--color-primary",
-  warning: "--color-warning",
-  info: "--color-primary",
-  rust: "--color-warning",
-  span: "--color-foreground",
-};
 
 const STATE_LABEL: Record<LearnStationState, string> = {
   solid: "Solid",
@@ -40,11 +35,6 @@ const STATE_LABEL: Record<LearnStationState, string> = {
   locked: "Locked",
   suggested: "Suggested",
 };
-
-function lineColor(token: string, colors: MobileThemeVariables): string {
-  if (token.startsWith("#") || token.startsWith("rgb")) return token;
-  return colors[LINE_COLOR[token] ?? "--color-primary"];
-}
 
 function stationSubtitle(station: LearnMapStation, lines: readonly LearnMapLine[]): string {
   const names = lines.filter((line) => station.lineIds.includes(line.id)).map((line) => line.title);
@@ -66,14 +56,20 @@ export function LearnMapScreen() {
   const learnStart = useAtomCommand(universal.learnStart, "learn start");
   const selectDetail = useSelectWorkspaceDetail();
   const { themeVariables } = useAppearancePreferences();
-  const [pickedId, setPickedId] = useState<string | null>(null);
+  const [mode, setMode] = useState<"map" | "list">("map");
+  const [focus, setFocus] = useState<MapFocus | null>(null);
   const [starting, setStarting] = useState(false);
   const map = mapQuery.data;
+  const route = focus?.kind === "route" ? focus : null;
   const selected =
-    map?.stations.find((station) => station.id === pickedId) ??
-    map?.stations.find((station) => station.id === map.here) ??
-    map?.stations[0] ??
-    null;
+    focus !== null && focus.kind !== "line"
+      ? (map?.stations.find((station) => station.id === focus.id) ?? null)
+      : null;
+  const focusedLine =
+    focus?.kind === "line"
+      ? (map?.lines.find((line) => line.id === focus.id) ??
+        (focus.id === OTHER_LINE_ID ? { id: OTHER_LINE_ID, title: "Other" } : null))
+      : null;
   const dueCount =
     statusQuery.data?.learn.due ??
     map?.stations.filter((station) => station.state === "due").length ??
@@ -96,39 +92,80 @@ export function LearnMapScreen() {
     });
   };
 
-  return (
-    <View className="flex-1 bg-screen">
-      <AppBar title="Knowledge map" />
-      {/* TransitMap mounts above the sheet. */}
+  const hasStations = map !== null && map !== undefined && map.stations.length > 0;
+  const planHere = () => {
+    if (map === null || map === undefined || selected === null) return;
+    setFocus({ kind: "route", id: selected.id, path: planRoute(map, selected.id) });
+    setMode("map");
+  };
+
+  let body;
+  if (environmentId === null) {
+    body = <Text className="text-sm text-foreground-muted">Connect an environment to learn.</Text>;
+  } else if (mapQuery.isPending && map === null) {
+    body = <AppActivityIndicator colorClassName="accent-icon-muted" />;
+  } else if (mapQuery.error) {
+    body = <Text className="text-sm text-danger-foreground">{mapQuery.error}</Text>;
+  } else if (!hasStations || map === null || map === undefined) {
+    body = <Text className="text-sm text-foreground-muted">No stops yet.</Text>;
+  } else if (mode === "list") {
+    body = (
       <ScrollView
         className="flex-1"
         contentContainerClassName="gap-4 px-4 py-3"
         keyboardShouldPersistTaps="handled"
       >
-        {environmentId === null ? (
-          <Text className="text-sm text-foreground-muted">Connect an environment to learn.</Text>
-        ) : mapQuery.isPending && map === null ? (
-          <AppActivityIndicator colorClassName="accent-icon-muted" />
-        ) : mapQuery.error ? (
-          <Text className="text-sm text-danger-foreground">{mapQuery.error}</Text>
-        ) : map === null || map.stations.length === 0 ? (
-          <Text className="text-sm text-foreground-muted">No stops yet.</Text>
-        ) : (
-          <StationGroups
-            map={map}
-            selectedId={selected?.id ?? null}
-            surface={surface}
-            warning={warning}
-            colors={themeVariables}
-            onSelect={setPickedId}
-          />
-        )}
+        <StationGroups
+          map={map}
+          selectedId={selected?.id ?? null}
+          surface={surface}
+          warning={warning}
+          colors={themeVariables}
+          onSelect={(id) => setFocus({ kind: "stop", id })}
+        />
       </ScrollView>
+    );
+  } else {
+    body = (
+      <TransitMap
+        map={map}
+        focus={focus}
+        colors={themeVariables}
+        onSelectStop={(id) => setFocus({ kind: "stop", id })}
+        onSelectLine={(id) => setFocus({ kind: "line", id })}
+        onClear={() => setFocus(null)}
+      />
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-screen">
+      <AppBar title="Knowledge map" />
+      {hasStations ? (
+        <View className="flex-row justify-end px-4 pt-2">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={mode === "map" ? "List" : "Map"}
+            onPress={() => setMode(mode === "map" ? "list" : "map")}
+            className="rounded-full px-3 py-1 active:opacity-70"
+          >
+            <Text className="text-sm font-t3-medium text-primary-text">
+              {mode === "map" ? "List" : "Map"}
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
+      {hasStations ? body : <View className="flex-1 px-4 py-3">{body}</View>}
       <View
         className="gap-3 border-t border-border-subtle bg-card px-4 pt-3"
         style={{ paddingBottom: Math.max(insets.bottom, 12) }}
       >
-        {selected ? (
+        {route && selected ? (
+          <View className="gap-1">
+            <Text className="text-sm text-foreground-muted">{routeSummary(map, route.path)}</Text>
+            <Text className="text-xl font-t3-bold text-foreground">{selected.title}</Text>
+          </View>
+        ) : selected ? (
           <View className="gap-1">
             <Text className="text-sm text-foreground-muted">
               {stationSubtitle(selected, map?.lines ?? [])}
@@ -138,44 +175,77 @@ export function LearnMapScreen() {
               <Text className="text-sm text-foreground-muted">{selected.misconception}</Text>
             ) : null}
           </View>
+        ) : focusedLine ? (
+          <View className="gap-1">
+            <Text className="text-sm text-foreground-muted">Line</Text>
+            <Text className="text-xl font-t3-bold text-foreground">{focusedLine.title}</Text>
+          </View>
         ) : (
           <Text className="text-sm text-foreground-muted">Tap a stop.</Text>
         )}
-        <View className="flex-row gap-2">
-          {selected ? (
-            <View className="flex-1">
-              <Button
-                fullWidth
-                tone="primary"
-                label={selected.state === "due" ? "Review now" : "Start lesson"}
-                loading={starting}
-                disabled={environmentId === null}
-                onPress={() =>
-                  void start(
-                    selected.state === "due"
-                      ? { kind: "review", conceptIds: [selected.id] }
-                      : { kind: "lesson", conceptIds: [selected.id] },
-                  )
-                }
-              />
-            </View>
-          ) : null}
-          {dueCount > 0 ? (
-            <View className="flex-1">
-              <Button
-                fullWidth
-                tone={selected ? "secondary" : "primary"}
-                label={`Review due (${dueCount})`}
-                loading={starting && selected === null}
-                disabled={environmentId === null}
-                onPress={() => void start({ kind: "review" })}
-              />
-            </View>
+        <View className="gap-2">
+          <View className="flex-row gap-2">
+            {route ? (
+              <View className="flex-1">
+                <Button
+                  fullWidth
+                  tone="primary"
+                  label="Start this route"
+                  loading={starting}
+                  disabled={environmentId === null}
+                  onPress={() => void start({ kind: "route", conceptIds: [...route.path] })}
+                />
+              </View>
+            ) : selected ? (
+              <>
+                <View className="flex-1">
+                  <Button
+                    fullWidth
+                    tone="primary"
+                    label={selected.state === "due" ? "Review now" : "Start lesson"}
+                    loading={starting}
+                    disabled={environmentId === null}
+                    onPress={() =>
+                      void start(
+                        selected.state === "due"
+                          ? { kind: "review", conceptIds: [selected.id] }
+                          : { kind: "lesson", conceptIds: [selected.id] },
+                      )
+                    }
+                  />
+                </View>
+                <View className="flex-1">
+                  <Button
+                    fullWidth
+                    tone="secondary"
+                    label="Plan route here"
+                    disabled={environmentId === null || starting}
+                    onPress={planHere}
+                  />
+                </View>
+              </>
+            ) : null}
+          </View>
+          {dueCount > 0 && route === null ? (
+            <Button
+              fullWidth
+              tone={selected ? "secondary" : "primary"}
+              label={`Review due (${dueCount})`}
+              loading={starting && selected === null}
+              disabled={environmentId === null}
+              onPress={() => void start({ kind: "review" })}
+            />
           ) : null}
         </View>
       </View>
     </View>
   );
+}
+
+function routeSummary(map: LearnMap | null | undefined, path: readonly string[]): string {
+  const hops = Math.max(0, path.length - 1);
+  const origin = map?.stations.find((station) => station.id === path[0])?.title ?? "here";
+  return `${hops} ${hops === 1 ? "stop" : "stops"} from ${origin}`;
 }
 
 function StationGroups(props: {
@@ -201,7 +271,7 @@ function StationGroups(props: {
             key={section.line.id}
             title={section.line.title}
             stations={section.stations}
-            color={lineColor(section.line.color, props.colors)}
+            color={learnLineColor(section.line.color, props.colors)}
             selectedId={props.selectedId}
             surface={props.surface}
             warning={props.warning}

@@ -7,6 +7,7 @@ import type {
   ThreadId,
 } from "@t3tools/contracts";
 import { prerequisiteClosure } from "@t3tools/universal-learn/graph";
+import { layoutFor, planRoute } from "@t3tools/universal-learn/mapModel";
 import {
   focusSet,
   OTHER_LINE_ID,
@@ -30,7 +31,7 @@ import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 
 import "./learnMap.css";
-import { layoutFor, linePaint, planRoute } from "./mapModel";
+import { linePaint } from "./mapModel";
 
 type FilterId = "solid" | "learning" | "due" | "ready";
 
