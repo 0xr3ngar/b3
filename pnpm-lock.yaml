@@ -1106,6 +1106,9 @@ importers:
       '@t3tools/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@t3tools/universal-learn':
+        specifier: workspace:*
+        version: link:../../packages/universal-learn
       '@tanstack/react-pacer':
         specifier: ^0.19.4
         version: 0.19.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
