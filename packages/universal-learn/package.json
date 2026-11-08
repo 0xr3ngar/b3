@@ -17,7 +17,13 @@
     },
     "./graph": {
       "types": "./src/graph.ts",
-      "import": "./src/graph.ts"
+      "import": "./src/graph.ts",
+      "default": "./src/graph.ts"
+    },
+    "./mapModel": {
+      "types": "./src/mapModel.ts",
+      "import": "./src/mapModel.ts",
+      "default": "./src/mapModel.ts"
     },
     "./mastery": {
       "types": "./src/mastery.ts",
@@ -25,7 +31,8 @@
     },
     "./transit": {
       "types": "./src/transit.ts",
-      "import": "./src/transit.ts"
+      "import": "./src/transit.ts",
+      "default": "./src/transit.ts"
     }
   },
   "scripts": {
