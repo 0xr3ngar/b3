@@ -5,12 +5,13 @@ import {
   UNIVERSAL_SPACE_PROJECT_IDS,
   UNIVERSAL_WS_METHODS,
   UniversalError,
+  UniversalRpcGroup,
   type UniversalStatus,
-  WS_METHODS,
 } from "@t3tools/contracts";
 import { mcpAppFromToolItem } from "@t3tools/shared/toolOutput";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
+import * as SubscriptionRef from "effect/SubscriptionRef";
 
 import * as McpAppRequests from "../mcpApps/McpAppRequests.ts";
 import * as Orchestrator from "../orchestration-v2/Orchestrator.ts";
@@ -99,24 +100,24 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
       const threadId = input.threadId;
       switch (name) {
         case "learn_widget_state":
-          return toolResult(yield* learn.widgetState({ threadId, ...(args as { itemId: string }) }));
+          return toolResult(yield* learn.widgetState({ ...(args as { itemId: string }), threadId }));
         case "learn_widget_answer":
-          return toolResult(yield* learn.answer({ threadId, ...(args as Parameters<typeof learn.answer>[0]) }));
+          return toolResult(yield* learn.answer({ ...(args as Parameters<typeof learn.answer>[0]), threadId }));
         case "learn_widget_hint":
-          return toolResult(yield* learn.hint({ threadId, ...(args as { itemId: string; cardIndex: number }) }));
+          return toolResult(yield* learn.hint({ ...(args as { itemId: string; cardIndex: number }), threadId }));
         case "learn_widget_reveal": {
           const target = args as { itemId: string; cardIndex: number };
           return toolResult(
-            yield* learn.answer({ threadId, ...target, answer: {}, confidence: "low", help: "answer" }),
+            yield* learn.answer({ ...target, threadId, answer: {}, confidence: "low", help: "answer" }),
           );
         }
         case "learn_widget_override":
           return toolResult(
-            yield* learn.override({ threadId, ...(args as Parameters<typeof learn.override>[0]) }),
+            yield* learn.override({ ...(args as Parameters<typeof learn.override>[0]), threadId }),
           );
         case "learn_widget_action":
           return toolResult(
-            yield* learn.widgetAction({ threadId, ...(args as Parameters<typeof learn.widgetAction>[0]) }),
+            yield* learn.widgetAction({ ...(args as Parameters<typeof learn.widgetAction>[0]), threadId }),
           );
       }
     },
@@ -125,7 +126,7 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
 
   const status = Effect.gen(function* () {
     const stats = yield* memory.stats;
-    const embedderStatus = yield* embedder.currentStatus;
+    const embedderStatus = yield* SubscriptionRef.get(embedder.status);
     const learnSummary = yield* learn.dueSummary;
     const result: UniversalStatus = {
       spaces: { chat: UNIVERSAL_SPACE_PROJECT_IDS.chat, learn: UNIVERSAL_SPACE_PROJECT_IDS.learn },
@@ -143,25 +144,28 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
       embedder: {
         modelId: embedderStatus.modelId,
         state: embedderStatus.state,
-        progress: embedderStatus.progress ?? null,
+        progress:
+          embedderStatus.progress === undefined || embedderStatus.progress.totalBytes === 0
+            ? null
+            : embedderStatus.progress.loadedBytes / embedderStatus.progress.totalBytes,
         error: embedderStatus.error ?? null,
-        msPerText: embedderStatus.msPerText ?? null,
+        msPerText: null,
         indexedCount: stats.embedded,
       },
-      embedderModels: EMBEDDER_MODELS.map((model) => ({
+      embedderModels: Object.values(EMBEDDER_MODELS).map((model) => ({
         id: model.id,
         label: model.label,
         provider: model.provider,
         dims: model.dims,
         approxDownloadMb: model.approxDownloadMb,
-        description: model.description,
+        description: `${model.languages}, up to ${model.maxTokens} tokens`,
       })),
       learn: learnSummary,
     };
     return result;
   });
 
-  return {
+  const fork = UniversalRpcGroup.of({
     [UNIVERSAL_WS_METHODS.getStatus]: () => status.pipe(Effect.mapError(toUniversalError)),
     [UNIVERSAL_WS_METHODS.getSettings]: () => settings.get.pipe(Effect.mapError(toUniversalError)),
     [UNIVERSAL_WS_METHODS.updateSettings]: (patch) =>
@@ -220,11 +224,16 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
       learn.action(input).pipe(Effect.as({}), Effect.mapError(toUniversalError)),
     [UNIVERSAL_WS_METHODS.learnStart]: (input) =>
       learn.start(input).pipe(Effect.mapError(toUniversalError)),
-    [WS_METHODS.mcpAppsCallTool]: (input: McpAppCallToolInput) =>
+  });
+
+  return {
+    rpc: fork,
+    /** Learn widget calls go to the fork; every other app call reaches upstream unchanged. */
+    callTool: (input: McpAppCallToolInput) =>
       Effect.flatMap(isForkWidget(input), (fork) =>
         fork ? runWidgetTool(input) : mcpAppRequests.callTool(input),
       ),
-    [WS_METHODS.mcpAppsToolInfo]: (input: McpAppToolInfoInput) =>
+    toolInfo: (input: McpAppToolInfoInput) =>
       Effect.flatMap(isForkWidget(input), (fork) =>
         fork
           ? Effect.succeed({ callable: true, readOnly: true, title: "Learn" })

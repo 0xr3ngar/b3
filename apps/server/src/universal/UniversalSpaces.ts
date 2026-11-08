@@ -8,6 +8,7 @@ import {
   universalSpaceOfProject,
   type UniversalSpace,
 } from "@t3tools/contracts";
+import * as Clock from "effect/Clock";
 import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
@@ -135,8 +136,9 @@ const make = Effect.gen(function* () {
 
   const setDefaultModel = Effect.fn("UniversalSpaces.setDefaultModel")(
     function* (space: SpaceKey, selection: ModelSelection | null) {
+      const at = yield* Clock.currentTimeMillis;
       yield* projects.update({
-        commandId: CommandId.make(`t3u-space:${space}:model:${Date.now()}`),
+        commandId: CommandId.make(`t3u-space:${space}:model:${at}`),
         projectId: projectId(space),
         defaultModelSelection: selection,
       });

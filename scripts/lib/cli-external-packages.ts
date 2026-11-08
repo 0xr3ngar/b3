@@ -19,6 +19,10 @@ const CLI_RUNTIME_EXTERNAL_PREFIXES = [
   "node-addon-api",
   "bufferutil",
   "utf-8-validate",
+  // universal-seam:native-externals (b3 embeddings and vector search load native binaries)
+  "@huggingface/transformers",
+  "onnxruntime-",
+  "@sqliteai/",
 ] as const;
 
 // Match Cursor dependency boundaries so zod does not externalize zod-to-json-schema.

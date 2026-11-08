@@ -1,3 +1,4 @@
+// @effect-diagnostics globalDate:off globalDateInEffect:off - SQLite rows and the pure memory helpers use ISO strings and Date.
 import {
   type MemoryKind,
   type MemoryRecord,
@@ -343,7 +344,7 @@ const make = Effect.gen(function* () {
           semantic.map((row) => ({ id: row.id })),
         ]),
         new Map([...byId.values()].map((row) => [row.id, { updatedAt: row.updated_at }])),
-        new Date(now),
+        new Date(now).toISOString(),
       );
       return fused
         .slice(0, limit)
@@ -388,8 +389,9 @@ const make = Effect.gen(function* () {
       !settings.chat.sensitiveOptIn.includes(sensitive.optInCategory)
     )
       return `${sensitive.optInCategory} is not enabled for memory`;
-    if (matchesTopicRule(text, settings.chat.topicRules).length > 0) return "topic rule";
-    if (isTombstoned(text, tombstones)) return "you asked to never remember this";
+    const rules = settings.chat.topicRules.map((rule) => ({ ...rule, keywords: [...rule.keywords] }));
+    if (matchesTopicRule(text, rules).length > 0) return "topic rule";
+    if (isTombstoned(text, [...tombstones])) return "you asked to never remember this";
     return null;
   };
 
@@ -424,17 +426,13 @@ const make = Effect.gen(function* () {
           // Similarity falls back to token overlap below.
         }
       }
+      const byText = new Map(
+        sameKind.map((row) => [row.text, similarities.get(row.id)] as const),
+      );
       const plan = planSupersede(
-        {
-          op: "add",
-          kind: input.kind,
-          text,
-          sourceMessageIds: [...(input.sourceMessageIds ?? ["manual"])],
-          confidence: input.confidence ?? 1,
-          ...(input.supersedes === undefined ? {} : { supersedes: [...input.supersedes] }),
-        },
+        { kind: input.kind, text },
         sameKind.map(toPureRow),
-        (a, b) => similarities.get(b.id) ?? tokenJaccard(a.text, b.text),
+        (a, b) => byText.get(b) ?? tokenJaccard(a, b),
       );
       if (plan.duplicateOf !== undefined) {
         const existing = readRows(sqlite, "id = ?", plan.duplicateOf)[0];
@@ -581,7 +579,7 @@ const make = Effect.gen(function* () {
     const rows = yield* db.use("memory.profileRows", (sqlite) =>
       readRows(sqlite, `${CURRENT} ORDER BY updated_at DESC`),
     );
-    return renderProfile(rows.map(toPureRow), { now: new Date(now) });
+    return renderProfile(rows.map(toPureRow), { now: new Date(now).toISOString() });
   });
 
   const readCursor = db.use("memory.cursor", (sqlite) => {
@@ -633,7 +631,7 @@ const make = Effect.gen(function* () {
         if (last !== undefined) yield* writeCursor({ updatedAt: last.updated_at, messageId: last.message_id });
         return empty;
       }
-      const formatted = formatBatchForExtractor(
+      const transcript = formatBatchForExtractor(
         usable.map((row) => ({
           id: row.message_id,
           threadId: row.thread_id,
@@ -643,7 +641,11 @@ const make = Effect.gen(function* () {
           createdAt: row.created_at,
         })),
       );
-      const included = usable.slice(0, Math.max(1, formatted.includedCount));
+      const includedCount = transcript.match(/\[m:/g)?.length ?? 0;
+      const included = usable.slice(0, Math.max(1, includedCount));
+      const header = `Allowed opt-in categories: ${
+        settings.chat.sensitiveOptIn.length === 0 ? "none" : settings.chat.sensitiveOptIn.join(", ")
+      }\n\n`;
       const end = included.at(-1) ?? usable[0]!;
       const batchId = yield* newId("batch");
       const at = yield* nowIso;
@@ -670,7 +672,7 @@ const make = Effect.gen(function* () {
       return {
         done: false,
         batchId,
-        transcript: formatted.text,
+        transcript: `${header}${transcript}`,
         messageCount: included.length,
         allowedSensitiveCategories: settings.chat.sensitiveOptIn,
       } satisfies MemoryBatch;

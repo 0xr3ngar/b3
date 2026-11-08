@@ -1,3 +1,4 @@
+// @effect-diagnostics globalDate:off globalDateInEffect:off - the FSRS library and SQLite rows exchange Date and ISO strings.
 import {
   CommandId,
   type LearnMap,
@@ -65,20 +66,24 @@ export interface LearnItemInput {
   readonly conceptId: string;
   readonly kind: "cloze" | "choice" | "short" | "recall";
   readonly stem: string;
-  readonly options?: ReadonlyArray<string>;
-  readonly correctIndex?: number;
-  readonly accept?: ReadonlyArray<string>;
-  readonly rubric?: {
-    readonly mustInclude: ReadonlyArray<ReadonlyArray<string>>;
-    readonly misconceptions?: ReadonlyArray<{
-      readonly id: string;
-      readonly patterns: ReadonlyArray<string>;
-      readonly note: string;
-    }>;
-  };
-  readonly correctAnswer?: string;
-  readonly explanation?: string;
-  readonly hint?: string;
+  readonly options?: ReadonlyArray<string> | undefined;
+  readonly correctIndex?: number | undefined;
+  readonly accept?: ReadonlyArray<string> | undefined;
+  readonly rubric?:
+    | {
+        readonly mustInclude: ReadonlyArray<ReadonlyArray<string>>;
+        readonly misconceptions?:
+          | ReadonlyArray<{
+              readonly id: string;
+              readonly patterns: ReadonlyArray<string>;
+              readonly note: string;
+            }>
+          | undefined;
+      }
+    | undefined;
+  readonly correctAnswer?: string | undefined;
+  readonly explanation?: string | undefined;
+  readonly hint?: string | undefined;
 }
 
 interface StoredItem {
@@ -651,11 +656,11 @@ const make = Effect.gen(function* () {
   const grade = (item: LearnItemInput, answer: { readonly text?: string; readonly choice?: number }) => {
     if (item.kind === "choice") {
       const outcome = gradeChoice(answer.choice ?? -1, item.correctIndex ?? -1);
-      return { outcome: outcome.outcome, missing: [] as Array<string>, misconceptionIds: [] as Array<string> };
+      return { outcome, missing: [] as Array<string>, misconceptionIds: [] as Array<string> };
     }
     if (item.kind === "cloze") {
       const outcome = gradeCloze(answer.text ?? "", { accept: [...(item.accept ?? [])] });
-      return { outcome: outcome.outcome, missing: [], misconceptionIds: [] };
+      return { outcome, missing: [] as Array<string>, misconceptionIds: [] as Array<string> };
     }
     const rubric = item.rubric ?? { mustInclude: (item.accept ?? []).map((value) => [value]) };
     const result = gradeShort(answer.text ?? "", {
@@ -671,7 +676,10 @@ const make = Effect.gen(function* () {
     });
     return {
       outcome: result.outcome,
-      missing: result.missingGroups.map((group: ReadonlyArray<string>) => group[0] ?? "").filter(Boolean),
+      missing: rubric.mustInclude
+        .filter((group) => !group.some((word) => (answer.text ?? "").toLowerCase().includes(word.toLowerCase())))
+        .map((group) => group[0] ?? "")
+        .filter(Boolean),
       misconceptionIds: [...result.misconceptionIds],
     };
   };
@@ -803,13 +811,16 @@ const make = Effect.gen(function* () {
     const { item, states } = yield* loadItem(input.threadId, input.itemId);
     const card = item.cards[input.cardIndex];
     const state = states[input.cardIndex];
-    if (card === undefined || state === undefined || card.hint === undefined)
+    const hintText = card?.hint;
+    if (card === undefined || state === undefined || hintText === undefined)
       return yield* new LearnError({ message: "No hint for this card." });
-    const updated = states.map((entry, index) =>
-      index === input.cardIndex && entry.status === "open" ? { ...entry, help: "hint" as const, hint: card.hint } : entry,
+    const updated: ReadonlyArray<StoredCardState> = states.map((entry, index) =>
+      index === input.cardIndex && entry.status === "open"
+        ? { ...entry, help: "hint" as const, hint: hintText }
+        : entry,
     );
     yield* writeStates(input.itemId, updated);
-    return { hint: card.hint };
+    return { hint: hintText };
   });
 
   const override: LearnService["Service"]["override"] = Effect.fn("LearnService.override")(function* (input) {

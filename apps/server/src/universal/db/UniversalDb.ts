@@ -44,7 +44,7 @@ export class UniversalDb extends Context.Service<
     ) => Effect.Effect<A, UniversalDbError>;
     readonly sizeBytes: Effect.Effect<number>;
   }
->()("t3/universal/UniversalDb") {}
+>()("t3/universal/db/UniversalDb") {}
 
 const migrate = (db: NodeSqlite.DatabaseSync) => {
   const row = db.prepare("PRAGMA user_version").get() as { user_version: number } | undefined;

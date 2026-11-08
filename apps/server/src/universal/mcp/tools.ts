@@ -2,7 +2,10 @@ import { OrchestratorMcpFailure } from "@t3tools/contracts";
 import * as Schema from "effect/Schema";
 import { Tool, Toolkit } from "effect/ai";
 
+import * as SecureRandom from "effect/crypto/SecureRandom";
+
 import * as McpInvocationContext from "../../mcp/McpInvocationContext.ts";
+import * as ThreadManagementService from "../../orchestration-v2/ThreadManagementService.ts";
 import * as LearnService from "../learn/LearnService.ts";
 import * as MemoryService from "../memory/MemoryService.ts";
 import * as UniversalSpaces from "../UniversalSpaces.ts";
@@ -31,6 +34,8 @@ const memoryShared = {
   failureMode: "return" as const,
   dependencies: [
     McpInvocationContext.McpInvocationContext,
+    ThreadManagementService.ThreadManagementService,
+    SecureRandom.SecureRandom,
     MemoryService.MemoryService,
     UniversalSpaces.UniversalSpaces,
   ],
@@ -142,6 +147,7 @@ const learnShared = {
   failureMode: "return" as const,
   dependencies: [
     McpInvocationContext.McpInvocationContext,
+    ThreadManagementService.ThreadManagementService,
     LearnService.LearnService,
     UniversalSpaces.UniversalSpaces,
     UniversalWidgetPublisher.UniversalWidgetPublisher,

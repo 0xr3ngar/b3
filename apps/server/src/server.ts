@@ -834,8 +834,6 @@ const layerMakeRoutes = Layer.mergeAll(
   Layer.provide(layerCommandReadiness),
   Layer.provide(ServerHttp.layerBrowserApiCors),
   Layer.provide(ServerHttp.layerHttpCompression),
-  // universal-seam:server-runtime
-  Layer.provide(Universal.layerServices),
 );
 
 const layerMakeServer = Layer.unwrap(
@@ -1196,6 +1194,8 @@ const layerMakeServer = Layer.unwrap(
 
     return layerServerApplication.pipe(
       Layer.provide(CloudLink.layer.pipe(Layer.provideMerge(ConnectReachability.layer))),
+      // universal-seam:server-runtime (request-time /ws and /mcp handlers read these)
+      Layer.provideMerge(Universal.layerServices),
       Layer.provideMerge(layerRuntimeServices),
       Layer.provideMerge(
         McpSessionRegistry.layer.pipe(

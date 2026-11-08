@@ -48,6 +48,8 @@
       "entry": [
         "src/bin.ts!",
         "src/claude-history-worker.ts!",
+        // universal-seam:embedder-worker
+        "src/universal-embedder-worker.ts!",
         "scripts/cli.ts",
         "scripts/fetch-expo-schema.ts",
         "scripts/probe-claude-fork-local-rollback-replay.ts",
@@ -69,6 +71,8 @@
         "@napi-rs/keyring",
         "ffi-rs",
         "transcribe-cpp",
+        // universal-seam:native-externals (resolved through its platform package)
+        "@sqliteai/sqlite-vector",
       ],
     },
     "apps/desktop": {

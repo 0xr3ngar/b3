@@ -1,7 +1,10 @@
 {
   "$comment": "Upstream files b3 edits. Everything else the fork adds is a new file. scripts/universal-seams.ts fails when an upstream file changes outside this list.",
   "upstream": "origin/main",
-  "generated": ["apps/web/src/routeTree.gen.ts", "pnpm-lock.yaml"],
+  "generated": [
+    "apps/web/src/routeTree.gen.ts",
+    "pnpm-lock.yaml"
+  ],
   "seams": {
     "packages/contracts/src/index.ts": "contracts-export",
     "packages/contracts/src/rpc.ts": "rpc-group",
@@ -23,7 +26,13 @@
     "apps/mobile/package.json": "dependencies",
     "apps/desktop/package.json": "native-unpack",
     "FORK.md": "fork-docs",
-    "AGENTS.md": "fork-docs"
+    "AGENTS.md": "fork-docs",
+    "scripts/lib/cli-external-packages.ts": "native-externals",
+    "apps/server/vite.config.ts": "embedder-worker",
+    "apps/server/src/ws.test.ts": "ws-handlers",
+    "pnpm-workspace.yaml": "allow-builds",
+    "knip.jsonc": "knip-entries",
+    "package.json": "scripts"
   },
   "patterns": {
     "apps/mobile/src/**": "mobile seams are marked universal-seam:mobile-*"

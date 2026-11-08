@@ -85,7 +85,7 @@ const tagSystemThread = Effect.gen(function* () {
   const threads = yield* ThreadManagementService.ThreadManagementService;
   const random = yield* SecureRandom.SecureRandom;
   const shell = yield* threads.getThreadShell(thread.threadId).pipe(Effect.orElseSucceed(() => null));
-  if (shell === null || shell.tags.includes(UNIVERSAL_SYSTEM_THREAD_TAG)) return thread;
+  if (shell === null || (shell.tags ?? []).includes(UNIVERSAL_SYSTEM_THREAD_TAG)) return thread;
   const id = yield* random.uuidV4().pipe(Effect.orDie);
   yield* threads
     .dispatch({

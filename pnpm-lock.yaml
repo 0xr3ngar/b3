@@ -850,6 +850,9 @@ importers:
       '@napi-rs/keyring':
         specifier: ^1.3.0
         version: 1.3.0
+      '@sqliteai/sqlite-vector':
+        specifier: 1.2.0
+        version: 1.2.0
       '@t3tools/provider-acp':
         specifier: workspace:*
         version: link:../../packages/provider-acp
@@ -904,6 +907,15 @@ importers:
       '@t3tools/source-control-gitlab':
         specifier: workspace:*
         version: link:../../packages/source-control-gitlab
+      '@t3tools/universal-learn':
+        specifier: workspace:*
+        version: link:../../packages/universal-learn
+      '@t3tools/universal-memory':
+        specifier: workspace:*
+        version: link:../../packages/universal-memory
+      '@t3tools/universal-widgets':
+        specifier: workspace:*
+        version: link:../../packages/universal-widgets
       character-entities:
         specifier: 2.0.2
         version: 2.0.2
@@ -2427,6 +2439,22 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@astrojs/compiler-rs@0.5.1)(@types/node@24.12.4)(@vitest/browser-playwright@5.0.5)(@vitest/ui@5.0.5)(@volar/typescript@2.4.28(typescript@6.0.3))(bufferutil@4.1.0)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.0(@noble/hashes@1.8.0))(playwright@1.60.0)(terser@5.48.0)(typescript@6.0.3)(unrun@0.2.39)(utf-8-validate@6.0.6)(yaml@2.9.0)
 
+  packages/universal-learn:
+    dependencies:
+      ts-fsrs:
+        specifier: 6.0.0
+        version: 6.0.0
+    devDependencies:
+      '@effect/vitest':
+        specifier: 4.1.2
+        version: 4.1.2(patch_hash=299510b71c36537a832a67e9d160a5f112a5f326a29e95c41cb45fc8234e47c7)(@astrojs/compiler-rs@0.5.1)(@types/node@24.12.4)(@vitest/browser-playwright@5.0.5)(@vitest/ui@5.0.5)(@volar/typescript@2.4.28(typescript@6.0.3))(bufferutil@4.1.0)(effect@4.1.2)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.0(@noble/hashes@1.8.0))(playwright@1.60.0)(terser@5.48.0)(typescript@6.0.3)(unrun@0.2.39)(utf-8-validate@6.0.6)(yaml@2.9.0)
+      '@types/node':
+        specifier: 24.12.4
+        version: 24.12.4
+      vite-plus:
+        specifier: 1.4.0
+        version: 1.4.0(@astrojs/compiler-rs@0.5.1)(@types/node@24.12.4)(@vitest/browser-playwright@5.0.5)(@vitest/ui@5.0.5)(@volar/typescript@2.4.28(typescript@6.0.3))(bufferutil@4.1.0)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.0(@noble/hashes@1.8.0))(playwright@1.60.0)(terser@5.48.0)(typescript@6.0.3)(unrun@0.2.39)(utf-8-validate@6.0.6)(yaml@2.9.0)
+
   packages/universal-memory:
     dependencies:
       effect:
@@ -2436,6 +2464,15 @@ importers:
       '@effect/vitest':
         specifier: 4.1.2
         version: 4.1.2(patch_hash=299510b71c36537a832a67e9d160a5f112a5f326a29e95c41cb45fc8234e47c7)(@astrojs/compiler-rs@0.5.1)(@types/node@24.12.4)(@vitest/browser-playwright@5.0.5)(@vitest/ui@5.0.5)(@volar/typescript@2.4.28(typescript@6.0.3))(bufferutil@4.1.0)(effect@4.1.2)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.0(@noble/hashes@1.8.0))(playwright@1.60.0)(terser@5.48.0)(typescript@6.0.3)(unrun@0.2.39)(utf-8-validate@6.0.6)(yaml@2.9.0)
+      '@types/node':
+        specifier: 24.12.4
+        version: 24.12.4
+      vite-plus:
+        specifier: 1.4.0
+        version: 1.4.0(@astrojs/compiler-rs@0.5.1)(@types/node@24.12.4)(@vitest/browser-playwright@5.0.5)(@vitest/ui@5.0.5)(@volar/typescript@2.4.28(typescript@6.0.3))(bufferutil@4.1.0)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.0(@noble/hashes@1.8.0))(playwright@1.60.0)(terser@5.48.0)(typescript@6.0.3)(unrun@0.2.39)(utf-8-validate@6.0.6)(yaml@2.9.0)
+
+  packages/universal-widgets:
+    devDependencies:
       '@types/node':
         specifier: 24.12.4
         version: 24.12.4
@@ -5212,6 +5249,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@open-spaced-repetition/srs-kit@1.0.0':
+    resolution: {integrity: sha512-f++JAMpRw7Yh1U4JcHzTtVknJ1bYKz/4yejsus6TRl+ueGJpvexNBrOoqaeUWCgH/e1j046oiqjzy4Nf4RW/vw==}
+    engines: {node: '>=20.0.0'}
+
   '@opencode-ai/sdk@1.15.13':
     resolution: {integrity: sha512-4TwojIoQ8EG6/mVBuUVYZXiFcwNmiiytEnjnvyuvSJjGwFIlw2YIBFxtSVC3FbwwbwHT63teh1RHiQUUC4U5xw==}
 
@@ -6551,6 +6592,52 @@ packages:
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
+
+  '@sqliteai/sqlite-vector-darwin-arm64@1.2.0':
+    resolution: {integrity: sha512-k5/wMDAxNQLF4MnJ5lk2rMpuLaZ0nz6J+VZwxVirZpQKGojR05WxneUsdoSjcYoiIaaHhAo4xMSQXyj6AXia9A==}
+    engines: {node: '>=16.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@sqliteai/sqlite-vector-darwin-x86_64@1.2.0':
+    resolution: {integrity: sha512-uNiGl4LUZL+v5gfmOl88LW6PXrARaYaHlbZRlML6q/HDUqvsUO9vlL7hb+T2uMFjHchidAVv9IEuR8Aw3XX5bg==}
+    engines: {node: '>=16.0.0'}
+    cpu: [x64, ia32]
+    os: [darwin]
+
+  '@sqliteai/sqlite-vector-linux-arm64-musl@1.2.0':
+    resolution: {integrity: sha512-gZZpbWxBr3Z3/ACRhsoAc2k9UU5fgao+dkSUOen/rxwh1ajyhA70umXY8OZQPr/DSGXfVORwxGi+Pe/xsHEXug==}
+    engines: {node: '>=16.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@sqliteai/sqlite-vector-linux-arm64@1.2.0':
+    resolution: {integrity: sha512-+/o7c+BJkfbw2+5cYtULCsFuO19Pz7JiPWeRRsc6d/E5k9AgDxFyV9spfpz+7tLv5ZgdvuewfhJgYDnY8hY3DQ==}
+    engines: {node: '>=16.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@sqliteai/sqlite-vector-linux-x86_64-musl@1.2.0':
+    resolution: {integrity: sha512-V2CXpWEnuosApZcUM6HfKsz9ziXVh4M2XZ24lQ4smTzvGO3Dl3qhe2NX6DgibuUDjh36AhLLwbZpASgQ5jyYUQ==}
+    engines: {node: '>=16.0.0'}
+    cpu: [x64, ia32]
+    os: [linux]
+
+  '@sqliteai/sqlite-vector-linux-x86_64@1.2.0':
+    resolution: {integrity: sha512-ZJ6UwxDieUO5lTUKkVWcwKAdeUW7wwJgQw7R4UZRkaTLoA6rj0TL16+BSYIkHDgM05sJLZ53evdChes3tD6kWA==}
+    engines: {node: '>=16.0.0'}
+    cpu: [x64, ia32]
+    os: [linux]
+
+  '@sqliteai/sqlite-vector-win32-x86_64@1.2.0':
+    resolution: {integrity: sha512-TJz6Obwm9xEPz8aer2c01sZSCMzgxguGknj7ayIH9BQl9fo08haKZjQePwfShCFEcdNjPK2xuMWvA2OJx2znLg==}
+    engines: {node: '>=16.0.0'}
+    cpu: [x64, ia32]
+    os: [win32]
+
+  '@sqliteai/sqlite-vector@1.2.0':
+    resolution: {integrity: sha512-REhArFzTny421EGW8u4c2IYJNxStmmuGFktVKe19PuptWgHItYVTbEdIF6BoEBPIt6hUQ1ZCLQ2XzJpVehD9Mw==}
+    engines: {node: '>=16.0.0'}
 
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
@@ -11855,6 +11942,10 @@ packages:
   ts-algebra@2.0.0:
     resolution: {integrity: sha512-FPAhNPFMrkwz76P7cdjdmiShwMynZYN6SgOujD1urY4oNm80Ou9oMdmbR45LotcKOXoy7wSmHkRFE6Mxbrhefw==}
 
+  ts-fsrs@6.0.0:
+    resolution: {integrity: sha512-kX03GIEhXgBtUrgZuv7k7Aax8oYF3GCO0lASqJFw/8cvvI7qjE83J8IzFhHugux7//W0yquG7zidk3e9NRgEwg==}
+    engines: {node: '>=24.0.0'}
+
   ts-morph@28.0.0:
     resolution: {integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==}
 
@@ -15295,6 +15386,8 @@ snapshots:
   '@noxcturnal/noxcturnal-win32-x64-msvc@0.1.1':
     optional: true
 
+  '@open-spaced-repetition/srs-kit@1.0.0': {}
+
   '@opencode-ai/sdk@1.15.13':
     dependencies:
       cross-spawn: 7.0.6
@@ -16215,6 +16308,37 @@ snapshots:
   '@sinclair/typebox@0.27.10': {}
 
   '@sindresorhus/is@4.6.0': {}
+
+  '@sqliteai/sqlite-vector-darwin-arm64@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector-darwin-x86_64@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector-linux-arm64-musl@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector-linux-arm64@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector-linux-x86_64-musl@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector-linux-x86_64@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector-win32-x86_64@1.2.0':
+    optional: true
+
+  '@sqliteai/sqlite-vector@1.2.0':
+    optionalDependencies:
+      '@sqliteai/sqlite-vector-darwin-arm64': 1.2.0
+      '@sqliteai/sqlite-vector-darwin-x86_64': 1.2.0
+      '@sqliteai/sqlite-vector-linux-arm64': 1.2.0
+      '@sqliteai/sqlite-vector-linux-arm64-musl': 1.2.0
+      '@sqliteai/sqlite-vector-linux-x86_64': 1.2.0
+      '@sqliteai/sqlite-vector-linux-x86_64-musl': 1.2.0
+      '@sqliteai/sqlite-vector-win32-x86_64': 1.2.0
 
   '@stablelib/base64@1.0.1': {}
 
@@ -22439,6 +22563,10 @@ snapshots:
       utf8-byte-length: 1.0.5
 
   ts-algebra@2.0.0: {}
+
+  ts-fsrs@6.0.0:
+    dependencies:
+      '@open-spaced-repetition/srs-kit': 1.0.0
 
   ts-morph@28.0.0:
     dependencies:

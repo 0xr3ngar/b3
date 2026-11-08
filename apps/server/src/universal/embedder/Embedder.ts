@@ -160,7 +160,11 @@ const normalize = (vector: Float32Array) => {
 };
 
 const defaultWorkerFactory = (data: EmbedderWorkerData): EmbedderWorkerHandle => {
-  const worker = new NodeWorkerThreads.Worker(new URL("./worker.ts", import.meta.url), {
+  // Source runs load the worker module directly; bundles emit it as its own entry beside bin.mjs.
+  const workerUrl = import.meta.url.endsWith(".ts")
+    ? new URL("./worker.ts", import.meta.url)
+    : new URL("./universal-embedder-worker.mjs", import.meta.url);
+  const worker = new NodeWorkerThreads.Worker(workerUrl, {
     workerData: data,
   });
   return {

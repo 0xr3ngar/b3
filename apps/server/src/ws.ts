@@ -2552,8 +2552,9 @@ export const layerWsRpc = (
                 })),
             };
           }),
-        [WS_METHODS.mcpAppsCallTool]: (input) => mcpAppRequests.callTool(input),
-        [WS_METHODS.mcpAppsToolInfo]: (input) => mcpAppRequests.toolInfo(input),
+        // universal-seam:ws-handlers (Learn widgets are answered by the fork)
+        [WS_METHODS.mcpAppsCallTool]: (input) => universalHandlers.callTool(input),
+        [WS_METHODS.mcpAppsToolInfo]: (input) => universalHandlers.toolInfo(input),
         [WS_METHODS.mcpAppsUpdateModelContext]: (input) => mcpAppRequests.updateModelContext(input),
         [WS_METHODS.mcpAppsReadResource]: (input) => mcpAppRequests.readResource(input),
         [WS_METHODS.providerUploadFeedback]:
@@ -3480,8 +3481,8 @@ export const layerWsRpc = (
               Stream.concat(Stream.make(latest), changes),
             ),
           ),
-        // universal-seam:ws-handlers (last, so fork widget calls wrap the MCP App handlers)
-        ...universalHandlers,
+        // universal-seam:ws-handlers
+        ...universalHandlers.rpc,
       });
       const splitHandlers: Pick<typeof handlers, SplitWsRpc["_tag"]> = handlers;
       const otherHandlers: Pick<typeof handlers, Exclude<ServerWsRpc, SplitWsRpc>["_tag"]> =
