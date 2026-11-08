@@ -299,15 +299,16 @@ const make = Effect.gen(function* () {
     limit: number,
   ): ReadonlyArray<MemoryDbRow & { readonly distance: number }> => {
     if (!ensureVectorInit(sqlite, vector.length)) return [];
+    // node:sqlite binds JS numbers as REAL; the extension requires an INTEGER limit.
     return sqlite
       .prepare(
         `SELECT m.rowid, m.*, v.distance AS distance
-         FROM vector_full_scan('memories', 'embedding', ?, ?) v
+         FROM vector_full_scan('memories', 'embedding', ?, ${limit * 3}) v
          JOIN memories m ON m.rowid = v.rowid
          WHERE m.deleted_at IS NULL AND m.superseded_by IS NULL AND m.embedder_id = ?
          ORDER BY v.distance`,
       )
-      .all(vectorBlob(vector), limit * 3, embedderId) as unknown as ReadonlyArray<
+      .all(vectorBlob(vector), embedderId) as unknown as ReadonlyArray<
       MemoryDbRow & { readonly distance: number }
     >;
   };
