@@ -20,7 +20,6 @@ const CLI_RUNTIME_EXTERNAL_PREFIXES = [
   "bufferutil",
   "utf-8-validate",
   // universal-seam:native-externals (b3 embeddings and vector search load native binaries)
-  "@huggingface/transformers",
   "onnxruntime-",
   "@sqliteai/",
 ] as const;
@@ -38,8 +37,46 @@ const CURSOR_RUNTIME_DEPENDENCIES = [
   "@fastify/busboy",
 ] as const;
 
+// universal-seam:native-externals (the runtime closure of b3's native embedder packages)
+const UNIVERSAL_RUNTIME_EXTERNALS = new Set([
+  "sharp",
+  "adm-zip",
+  "global-agent",
+  "flatbuffers",
+  "guid-typescript",
+  "long",
+  "platform",
+  "protobufjs",
+  "detect-libc",
+  "semver",
+  "boolean",
+  "es6-error",
+  "matcher",
+  "roarr",
+  "serialize-error",
+  "@types/node",
+  "undici-types",
+  "escape-string-regexp",
+  "detect-node",
+  "globalthis",
+  "json-stringify-safe",
+  "semver-compare",
+  "sprintf-js",
+  "type-fest",
+  "define-properties",
+  "gopd",
+  "define-data-property",
+  "has-property-descriptors",
+  "object-keys",
+  "es-define-property",
+  "es-errors",
+]);
+
 export function isRuntimeExternalCliDependency(id: string): boolean {
+  const bare = id.startsWith("@") ? id.split("/").slice(0, 2).join("/") : (id.split("/")[0] ?? id);
   return (
+    UNIVERSAL_RUNTIME_EXTERNALS.has(bare) ||
+    ["@huggingface/", "@img/", "@protobufjs/"].some((prefix) => id.startsWith(prefix)) ||
     CLI_RUNTIME_EXTERNAL_PREFIXES.some((prefix) => id.startsWith(prefix)) ||
     CURSOR_RUNTIME_DEPENDENCIES.some((name) => id === name || id.startsWith(`${name}/`))
   );

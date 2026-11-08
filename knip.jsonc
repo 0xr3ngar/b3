@@ -81,6 +81,7 @@
         "transcribe-cpp",
         // universal-seam:native-externals (resolved through its platform package)
         "@sqliteai/sqlite-vector",
+        "escape-string-regexp",
       ],
     },
     "apps/desktop": {
