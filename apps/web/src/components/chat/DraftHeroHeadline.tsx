@@ -51,6 +51,8 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
 import { DraftHeroProjectHeading } from "./DraftHeroProjectHeading";
+// universal-seam:space-hero
+import { SpaceDraftHero, spaceDraftHeading } from "../../universal/SpaceDraftHero";
 import { TriageDraftHero } from "./TriageDraftHero";
 import { resolveProjectSettings } from "@t3tools/shared/projectSettings";
 import { resolveProjectDefaultProviderModelSelection } from "../../providerInstances";
@@ -410,6 +412,10 @@ export function DraftHeroHeadline({
       />
     );
   }
+
+  // universal-seam:space-hero
+  const spaceHeading = spaceDraftHeading(activeProjectRef?.projectId);
+  if (spaceHeading !== null) return <SpaceDraftHero heading={spaceHeading} />;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center">

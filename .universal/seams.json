@@ -32,7 +32,8 @@
     "apps/server/src/ws.test.ts": "ws-handlers",
     "pnpm-workspace.yaml": "allow-builds",
     "knip.jsonc": "knip-entries",
-    "package.json": "scripts"
+    "package.json": "scripts",
+    "apps/web/src/components/chat/DraftHeroHeadline.tsx": "space-hero"
   },
   "patterns": {
     "apps/mobile/src/**": "mobile seams are marked universal-seam:mobile-*"
