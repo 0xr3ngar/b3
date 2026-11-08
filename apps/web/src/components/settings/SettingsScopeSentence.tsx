@@ -46,6 +46,11 @@ export const SETTINGS_DEVICE_ONLY_PATHS: ReadonlySet<string> = new Set([
   "/settings/general",
   "/settings/appearance",
   "/settings/chat",
+  // universal-seam:settings-nav
+  "/settings/chat-assistant",
+  "/settings/chat-memory",
+  "/settings/learn-tutor",
+  "/settings/learn-knowledge",
   "/settings/diffs",
   "/settings/snap-shot",
   "/settings/connections",

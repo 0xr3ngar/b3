@@ -10,7 +10,7 @@ import * as ServerConfig from "../config.ts";
 import { snapshotMcpApp } from "../mcpApps/McpAppSnapshot.ts";
 
 export const UNIVERSAL_MCP_SERVER = "t3-code";
-export const LEARN_WIDGET_URI = "ui://t3-code/learn";
+const LEARN_WIDGET_URI = "ui://t3-code/learn";
 
 /** Writes the Learn widget document as a thread attachment, the same way adapters snapshot MCP Apps. */
 export class UniversalWidgetPublisher extends Context.Service<
@@ -47,7 +47,9 @@ const make = Effect.gen(function* () {
     }).pipe(
       Effect.provideService(FileSystem.FileSystem, fileSystem),
       Effect.catchCause((cause) =>
-        Effect.logWarning("b3 could not publish a Learn widget", { cause }).pipe(Effect.as(undefined)),
+        Effect.logWarning("b3 could not publish a Learn widget", { cause }).pipe(
+          Effect.as(undefined),
+        ),
       ),
     );
   });

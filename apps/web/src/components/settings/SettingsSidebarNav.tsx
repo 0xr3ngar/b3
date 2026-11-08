@@ -9,7 +9,9 @@ import {
 } from "react";
 import {
   ArchiveIcon,
+  BrainIcon,
   FlaskConicalIcon,
+  GraduationCapIcon,
   BotIcon,
   createLucideIcon,
   CalendarClockIcon,
@@ -23,6 +25,7 @@ import {
   PanelsTopLeftIcon,
   KeyboardIcon,
   KeyRoundIcon,
+  LibraryIcon,
   MicIcon,
   PaletteIcon,
   SearchIcon,
@@ -30,6 +33,7 @@ import {
   Settings2Icon,
   ShieldCheckIcon,
   SmartphoneIcon,
+  WaypointsIcon,
   WrenchIcon,
   XIcon,
 } from "lucide-react";
@@ -91,6 +95,11 @@ const SETTINGS_SECTION_ICONS: Readonly<
   "/settings/voice": MicIcon,
   "/settings/appearance": PaletteIcon,
   "/settings/chat": MessageSquareTextIcon,
+  // universal-seam:settings-nav
+  "/settings/chat-assistant": BrainIcon,
+  "/settings/chat-memory": LibraryIcon,
+  "/settings/learn-tutor": GraduationCapIcon,
+  "/settings/learn-knowledge": WaypointsIcon,
   "/settings/diffs": FileDiffIcon,
   "/settings/projects": PanelsTopLeftIcon,
   "/settings/keybindings": KeyboardIcon,
