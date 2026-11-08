@@ -219,7 +219,9 @@ export function mcpAppFromToolItem(item: {
   const app = compactDynamicToolOutput(item.output)?.[MCP_APP_OUTPUT_KEY];
   return app !== undefined &&
     (item.toolName === `${app.server}.${app.tool}` ||
-      item.toolName === claudeMcpToolName(app.server, app.tool))
+      item.toolName === claudeMcpToolName(app.server, app.tool) ||
+      // universal-seam:mcp-app-names (T3's own tools arrive in each provider's name shape)
+      (app.server === "t3-code" && resolveT3McpToolId(item.toolName) === app.tool))
     ? app
     : undefined;
 }

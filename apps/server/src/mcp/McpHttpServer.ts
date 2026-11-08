@@ -79,6 +79,8 @@ import {
 import * as HtmlHandlers from "./toolkits/html/handlers.ts";
 import { HtmlPreviewTool, HtmlPreviewToolkit, HtmlRenderToolkit } from "./toolkits/html/tools.ts";
 import { requestUrl } from "../requestUrl.ts";
+// universal-seam:mcp-tools
+import { makeUniversalMcpTools } from "../universal/mcp/layer.ts";
 
 const mcpResourceMetadataUrl = (request: HttpServerRequest.HttpServerRequest) =>
   requestUrl(request).pipe(
@@ -1243,4 +1245,10 @@ export const layerTools = Layer.mergeAll(
   layerHtmlToolkit,
 );
 
-export const layer = layerMcpTransport(layerTools);
+// universal-seam:mcp-tools
+export const toolkitVisibility = McpServer.visibility;
+
+export const layer = layerMcpTransport(
+  // universal-seam:mcp-tools
+  Layer.merge(layerTools, makeUniversalMcpTools(toolkitRegistration, toolkitVisibility)),
+);

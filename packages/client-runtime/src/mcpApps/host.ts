@@ -539,6 +539,12 @@ export function mcpAppStyleVariables(
     ["--font-sans", pick("--font-sans")],
     ["--font-mono", pick("--font-mono")],
     ["--border-radius-md", pick("--radius")],
+    // universal-seam:mcp-app-accent
+    ["--t3-primary", pick("--primary")],
+    ["--t3-primary-foreground", pick("--primary-foreground")],
+    ["--t3-success", pick("--success")],
+    ["--t3-warning", pick("--warning")],
+    ["--t3-destructive", pick("--destructive")],
   ];
   const variables: Record<string, string> = {};
   for (const [name, value] of pairs) {

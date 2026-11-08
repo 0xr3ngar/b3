@@ -475,6 +475,13 @@ export function summarizeT3ToolCalls(
     case "capabilities":
       label = phrase("Checked", "check", `orchestration capabilities ${times}`);
       break;
+    // universal-seam:tool-labels
+    case "memory":
+      label = phrase("Used", "use", `memory ${times}`);
+      break;
+    case "learn":
+      label = phrase("Used", "use", `Learn tools ${times}`);
+      break;
   }
   return { label, failedCount };
 }

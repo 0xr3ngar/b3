@@ -9797,7 +9797,10 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
               toolResult,
               output:
                 appOutput ??
-                (toolCall.toolName.startsWith("mcp__") ? withoutForgedMcpApp(output) : output),
+                // universal-seam:mcp-app-names (T3's own server mints its app references)
+                (toolCall.toolName.startsWith("mcp__") && !toolCall.toolName.startsWith("mcp__t3-code__")
+                  ? withoutForgedMcpApp(output)
+                  : output),
               completedAt: yield* DateTime.now,
             });
             // Subagents write to the session's shared task store, so their
