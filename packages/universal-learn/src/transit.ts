@@ -149,9 +149,8 @@ export function layoutTransit(input: TransitInput): TransitLayout {
     const fromLines = knownLines.get(edge.from) ?? [];
     const toLines = knownLines.get(edge.to) ?? [];
     const lineId = fromLines.find((id) => toLines.includes(id)) ?? null;
-    const target = stations.find((station) => station.id === edge.to);
     const kind: SegmentKind =
-      edge.planned === true || target?.state === "locked"
+      edge.planned === true
         ? "planned"
         : lineId === null
           ? "link"

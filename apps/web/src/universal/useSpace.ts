@@ -1,6 +1,7 @@
 import type { UniversalSpace } from "@t3tools/contracts";
 import { scopeThreadRef, scopedThreadKey } from "@t3tools/client-runtime/environment";
 import type { EnvironmentThreadShell } from "@t3tools/client-runtime/state/models";
+import { useLocation } from "@tanstack/react-router";
 
 import { useComposerDraftStore } from "../composerDraftStore";
 import { useThreadRouteTarget } from "../hooks/useThreadRouteTarget";
@@ -28,6 +29,8 @@ export function useActiveSpace(): UniversalSpace {
   const threads = useQuietThreadShells();
   const routeProjectId = useRouteProjectId(threads);
   const storedSpace = useSpaceStore((store) => store.space);
+  const onLearnHome = useLocation({ select: (location) => location.pathname === "/learn" });
+  if (onLearnHome) return "learn";
   return resolveActiveSpace({ routeProjectId, storedSpace });
 }
 

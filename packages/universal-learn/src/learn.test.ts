@@ -408,7 +408,7 @@ describe("layoutTransit", () => {
       { from: "traits", to: "gen" },
       { from: "own", to: "borrow" },
       { from: "cond", to: "gen" },
-      { from: "gen", to: "post" },
+      { from: "gen", to: "post", planned: true },
       { from: "cond", to: "mc" },
     ],
   };
