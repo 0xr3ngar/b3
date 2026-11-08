@@ -98,7 +98,7 @@ interface EdgeEnds {
 
 // Square grid so a one-row spur meets the trunk on a 45° diagonal.
 const DX = 120;
-const DY = 120;
+const DY = 92;
 const MARGIN = 48;
 const LABEL_CHAR_PX = 7.2;
 const LABEL_SIZE_PX = 12.5;

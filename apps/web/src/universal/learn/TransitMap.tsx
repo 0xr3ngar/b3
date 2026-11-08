@@ -193,11 +193,12 @@ function MapStage(props: {
   readonly onSelectLine: (id: string) => void;
   readonly onClear: () => void;
 }) {
+  // The topic composer floats over the bottom of the stage; keep the map clear of it.
   const fitted = {
     x: 0,
     y: 0,
     w: props.layout.width,
-    h: props.layout.height,
+    h: props.layout.height + 120,
   };
   const [box, setBox] = useState<ViewBox>(fitted);
   const [dragging, setDragging] = useState(false);
