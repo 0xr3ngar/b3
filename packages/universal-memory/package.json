@@ -1,0 +1,47 @@
+{
+  "name": "@t3tools/universal-memory",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schema": {
+      "types": "./src/schema.ts",
+      "import": "./src/schema.ts"
+    },
+    "./sensitive": {
+      "types": "./src/sensitive.ts",
+      "import": "./src/sensitive.ts"
+    },
+    "./rules": {
+      "types": "./src/rules.ts",
+      "import": "./src/rules.ts"
+    },
+    "./fusion": {
+      "types": "./src/fusion.ts",
+      "import": "./src/fusion.ts"
+    },
+    "./profile": {
+      "types": "./src/profile.ts",
+      "import": "./src/profile.ts"
+    },
+    "./supersede": {
+      "types": "./src/supersede.ts",
+      "import": "./src/supersede.ts"
+    },
+    "./batch": {
+      "types": "./src/batch.ts",
+      "import": "./src/batch.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "effect-tsgo tsrs --noEmit",
+    "test": "vp test run --config ../../vite.config.ts --dir ."
+  },
+  "dependencies": {
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "@types/node": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
