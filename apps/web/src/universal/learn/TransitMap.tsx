@@ -9,6 +9,7 @@ import type {
 import { prerequisiteClosure } from "@t3tools/universal-learn/graph";
 import {
   focusSet,
+  OTHER_LINE_ID,
   roundedPath,
   type LabelAt,
   type TransitLayout,
@@ -449,7 +450,13 @@ function MapStage(props: {
                 data-part="seg"
                 data-dim={litStub ? "false" : "true"}
                 d={roundedPath(stub.points)}
-                stroke={line ? linePaint(line.color) : "var(--foreground)"}
+                stroke={
+                  stub.lineId === OTHER_LINE_ID
+                    ? "var(--muted-foreground)"
+                    : line
+                      ? linePaint(line.color)
+                      : "var(--foreground)"
+                }
                 strokeWidth={lit !== null && litStub ? 7 : 6}
               />
             );
@@ -548,11 +555,17 @@ function MapStage(props: {
         <g>
           {props.layout.bullets.map((bullet) => {
             const line = lines.get(bullet.lineId);
-            if (!line) return null;
+            const other = bullet.lineId === OTHER_LINE_ID;
+            if (!line && !other) return null;
+            const title = line?.title ?? "Other";
             const dim =
               lit !== null &&
               !props.map.stations.some(
-                (station) => lit.has(station.id) && station.lineIds.includes(bullet.lineId),
+                (station) =>
+                  lit.has(station.id) &&
+                  (other
+                    ? station.lineIds.length === 0 && station.state !== "suggested"
+                    : station.lineIds.includes(bullet.lineId)),
               );
             return (
               <g
@@ -562,7 +575,7 @@ function MapStage(props: {
                 data-line={bullet.lineId}
                 role="button"
                 tabIndex={0}
-                aria-label={line.title}
+                aria-label={title}
                 aria-pressed={
                   props.selection?.kind === "line" && props.selection.id === bullet.lineId
                 }
@@ -574,10 +587,16 @@ function MapStage(props: {
                   width={bullet.width}
                   height={18}
                   rx={4}
-                  fill={linePaint(line.color)}
+                  fill={
+                    other
+                      ? "var(--muted-foreground)"
+                      : line
+                        ? linePaint(line.color)
+                        : "var(--foreground)"
+                  }
                 />
                 <text x={bullet.x + bullet.width / 2} y={bullet.y + 3.8} textAnchor="middle">
-                  {line.title}
+                  {title}
                 </text>
               </g>
             );
@@ -881,15 +900,30 @@ function LineCard(props: {
   readonly onStart: (input: LearnStartInput) => void;
   readonly onClear: () => void;
 }) {
-  const line = props.map.lines.find((item) => item.id === props.selection.id);
+  const line =
+    props.map.lines.find((item) => item.id === props.selection.id) ??
+    (props.selection.id === OTHER_LINE_ID
+      ? { id: OTHER_LINE_ID, title: "Other", color: "other" }
+      : undefined);
   if (!line) return null;
-  const stops = props.map.stations.filter((station) => station.lineIds.includes(line.id));
+  const stops =
+    line.id === OTHER_LINE_ID
+      ? props.map.stations.filter(
+          (station) => station.lineIds.length === 0 && station.state !== "suggested",
+        )
+      : props.map.stations.filter((station) => station.lineIds.includes(line.id));
   const solid = stops.filter((station) => station.state === "solid").length;
   const due = stops.filter((station) => station.state === "due");
   return (
     <section data-part="det" aria-label={line.title}>
       <div data-part="ln">
-        <span data-part="swatch" style={{ background: linePaint(line.color) }} />
+        <span
+          data-part="swatch"
+          style={{
+            background:
+              line.id === OTHER_LINE_ID ? "var(--muted-foreground)" : linePaint(line.color),
+          }}
+        />
         <span>Line</span>
         <ClearButton onClear={props.onClear} />
       </div>

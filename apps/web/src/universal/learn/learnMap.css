@@ -114,6 +114,10 @@
   opacity: 0;
 }
 
+[data-learn-map] [data-part="bul"][data-line="other"] text {
+  fill: var(--background);
+}
+
 [data-learn-map] [data-part="bul"] text {
   fill: var(--primary-foreground);
   font: 800 11px/1 var(--map-font);

@@ -25,7 +25,16 @@ import {
   type PlanConcept,
 } from "./graph.ts";
 import { canAdvance, updateMastery } from "./mastery.ts";
-import { focusSet, layoutTransit, roundedPath, type TransitInput } from "./transit.ts";
+import { realMap } from "./realMapFixture.ts";
+import {
+  focusSet,
+  layoutTransit,
+  OTHER_LINE_ID,
+  roundedPath,
+  transitLabelBox,
+  transitSubtitle,
+  type TransitInput,
+} from "./transit.ts";
 
 const now = new Date("2026-01-15T12:00:00.000Z");
 const dayMs = 86_400_000;
@@ -485,7 +494,146 @@ describe("layoutTransit", () => {
     const keys = pinned.stations.map((station) => `${station.x},${station.y}`);
     assert.equal(new Set(keys).size, keys.length);
   });
+
+  it("lays the real map out as trunks, spurs, and a bottom Other line", () => {
+    const layout = layoutTransit(realMap);
+    const byId = new Map(layout.stations.map((station) => [station.id, station]));
+
+    const overlaps: string[] = [];
+    const outside: string[] = [];
+    const boxes = realMap.stations.flatMap((station) => {
+      const laid = byId.get(station.id);
+      if (!laid) return [];
+      const box = transitLabelBox(
+        station.title,
+        laid.x,
+        laid.y,
+        laid.labelAt,
+        laid.interchange,
+        transitSubtitle(station),
+      );
+      if (
+        box.left < -0.01 ||
+        box.top < -0.01 ||
+        box.right > layout.width + 0.01 ||
+        box.bottom > layout.height + 0.01
+      ) {
+        outside.push(station.id);
+      }
+      return [{ id: station.id, box }];
+    });
+    for (let left = 0; left < boxes.length; left++) {
+      for (let right = left + 1; right < boxes.length; right++) {
+        const a = boxes[left];
+        const b = boxes[right];
+        if (!a || !b) continue;
+        if (boxesOverlap(a.box, b.box)) overlaps.push(`${a.id} ${b.id}`);
+      }
+    }
+    assert.deepEqual(overlaps, []);
+    assert.deepEqual(outside, []);
+
+    const crossings: string[] = [];
+    const byLine = new Map<
+      string,
+      { from: string; to: string; points: readonly (readonly [number, number])[] }[]
+    >();
+    for (const segment of layout.segments) {
+      if (!segment.lineId) continue;
+      const list = byLine.get(segment.lineId) ?? [];
+      list.push(segment);
+      byLine.set(segment.lineId, list);
+    }
+    for (const [lineId, segments] of byLine) {
+      for (let left = 0; left < segments.length; left++) {
+        for (let right = left + 1; right < segments.length; right++) {
+          const a = segments[left];
+          const b = segments[right];
+          if (!a || !b) continue;
+          if (legsCross(a.points, b.points))
+            crossings.push(`${lineId} ${a.from}->${a.to} ${b.from}->${b.to}`);
+        }
+      }
+    }
+    assert.deepEqual(crossings, []);
+
+    const orphans = ["bayes-rule", "bayes.likelihood", "bayes.prior"];
+    const orphanStations = orphans.flatMap((id) => {
+      const station = byId.get(id);
+      return station ? [station] : [];
+    });
+    assert.equal(orphanStations.length, orphans.length);
+    for (const station of orphanStations) assert.equal(station.lineId, OTHER_LINE_ID);
+    const orphanY = orphanStations[0]?.y;
+    assert.equal(
+      orphanStations.every((station) => station.y === orphanY),
+      true,
+    );
+    const lined = layout.stations.filter(
+      (station) => station.lineId !== null && station.lineId !== OTHER_LINE_ID,
+    );
+    const lowestLine = Math.max(...lined.map((station) => station.y));
+    assert.equal(orphanY !== undefined && orphanY > lowestLine, true);
+    assert.equal(
+      layout.bullets.some((bullet) => bullet.lineId === OTHER_LINE_ID),
+      true,
+    );
+    const spanish = byId.get("spanish-beginner");
+    const rightOrphan = Math.max(...orphanStations.map((station) => station.x));
+    assert.equal(
+      spanish !== undefined &&
+        spanish.lineId === null &&
+        spanish.x > rightOrphan &&
+        spanish.y >= (orphanY ?? 0),
+      true,
+    );
+  });
 });
+
+function boxesOverlap(
+  a: { left: number; top: number; right: number; bottom: number },
+  b: { left: number; top: number; right: number; bottom: number },
+): boolean {
+  return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+}
+
+function legsCross(
+  a: readonly (readonly [number, number])[],
+  b: readonly (readonly [number, number])[],
+): boolean {
+  for (let i = 1; i < a.length; i++) {
+    const a0 = a[i - 1];
+    const a1 = a[i];
+    if (!a0 || !a1) continue;
+    for (let j = 1; j < b.length; j++) {
+      const b0 = b[j - 1];
+      const b1 = b[j];
+      if (!b0 || !b1) continue;
+      if (properCross(a0, a1, b0, b1)) return true;
+    }
+  }
+  return false;
+}
+
+function properCross(
+  a: readonly [number, number],
+  b: readonly [number, number],
+  c: readonly [number, number],
+  d: readonly [number, number],
+): boolean {
+  const d1 = cross(b[0] - a[0], b[1] - a[1], c[0] - a[0], c[1] - a[1]);
+  const d2 = cross(b[0] - a[0], b[1] - a[1], d[0] - a[0], d[1] - a[1]);
+  const d3 = cross(d[0] - c[0], d[1] - c[1], a[0] - c[0], a[1] - c[1]);
+  const d4 = cross(d[0] - c[0], d[1] - c[1], b[0] - c[0], b[1] - c[1]);
+  if (Math.abs(d1) < 1e-6 || Math.abs(d2) < 1e-6 || Math.abs(d3) < 1e-6 || Math.abs(d4) < 1e-6) {
+    return false;
+  }
+  return d1 * d2 < 0 && d3 * d4 < 0;
+}
+
+function cross(ax: number, ay: number, bx: number, by: number): number {
+  return ax * by - ay * bx;
+}
 
 function isOctilinear(points: readonly (readonly [number, number])[]): boolean {
   if (points.length < 2) return false;
