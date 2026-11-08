@@ -1,7 +1,7 @@
 // @effect-diagnostics nodeBuiltinImport:off - node:sqlite is the only SQLite binding that loads extensions here.
 import * as NodeFS from "node:fs";
 import * as NodePath from "node:path";
-import { DatabaseSync } from "node:sqlite";
+import * as NodeSqlite from "node:sqlite";
 
 import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
@@ -36,16 +36,19 @@ export class UniversalDb extends Context.Service<
     readonly path: string;
     readonly vector: VectorSupport;
     /** Synchronous work on the connection; node:sqlite is synchronous and single-connection here. */
-    readonly use: <A>(operation: string, f: (db: DatabaseSync) => A) => Effect.Effect<A, UniversalDbError>;
+    readonly use: <A>(
+      operation: string,
+      f: (db: NodeSqlite.DatabaseSync) => A,
+    ) => Effect.Effect<A, UniversalDbError>;
     readonly transaction: <A>(
       operation: string,
-      f: (db: DatabaseSync) => A,
+      f: (db: NodeSqlite.DatabaseSync) => A,
     ) => Effect.Effect<A, UniversalDbError>;
     readonly sizeBytes: Effect.Effect<number>;
   }
 >()("t3/universal/UniversalDb") {}
 
-const migrate = (db: DatabaseSync) => {
+const migrate = (db: NodeSqlite.DatabaseSync) => {
   const row = db.prepare("PRAGMA user_version").get() as { user_version: number } | undefined;
   const current = row?.user_version ?? 0;
   for (let index = current; index < UNIVERSAL_MIGRATIONS.length; index++) {
@@ -61,7 +64,7 @@ const migrate = (db: DatabaseSync) => {
   }
 };
 
-const loadVector = (db: DatabaseSync): VectorSupport => {
+const loadVector = (db: NodeSqlite.DatabaseSync): VectorSupport => {
   const resolved = resolveSqliteVectorPath();
   if ("error" in resolved) return { available: false, reason: resolved.error };
   try {
@@ -78,12 +81,12 @@ const loadVector = (db: DatabaseSync): VectorSupport => {
 
 export const openUniversalDatabase = (path: string) => {
   if (path !== ":memory:") NodeFS.mkdirSync(NodePath.dirname(path), { recursive: true });
-  let db: DatabaseSync;
+  let db: NodeSqlite.DatabaseSync;
   try {
-    db = new DatabaseSync(path, { allowExtension: true });
+    db = new NodeSqlite.DatabaseSync(path, { allowExtension: true });
   } catch {
     // Runtimes built without extension loading still get FTS-only memory.
-    db = new DatabaseSync(path);
+    db = new NodeSqlite.DatabaseSync(path);
   }
   db.exec("PRAGMA journal_mode = WAL");
   db.exec("PRAGMA synchronous = NORMAL");
@@ -94,7 +97,7 @@ export const openUniversalDatabase = (path: string) => {
   return { db, vector };
 };
 
-export const makeWithDatabase = (path: string, opened: ReturnType<typeof openUniversalDatabase>) => {
+const makeWithDatabase = (path: string, opened: ReturnType<typeof openUniversalDatabase>) => {
   const { db, vector } = opened;
   const use: UniversalDb["Service"]["use"] = (operation, f) =>
     Effect.try({
@@ -131,7 +134,7 @@ export const makeWithDatabase = (path: string, opened: ReturnType<typeof openUni
   return UniversalDb.of({ path, vector, use, transaction, sizeBytes });
 };
 
-export const universalDbPath = (stateDir: string) => NodePath.join(stateDir, "universal.sqlite");
+const universalDbPath = (stateDir: string) => NodePath.join(stateDir, "universal.sqlite");
 
 export const layer = Layer.effect(
   UniversalDb,
@@ -150,6 +153,7 @@ export const layer = Layer.effect(
 );
 
 /** In-memory database for tests. */
+/** @public */
 export const layerMemory = Layer.effect(
   UniversalDb,
   Effect.acquireRelease(

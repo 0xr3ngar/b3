@@ -22,6 +22,11 @@ export type SettingsPath =
   | "/settings/voice"
   | "/settings/appearance"
   | "/settings/chat"
+  // universal-seam:settings-nav
+  | "/settings/chat-assistant"
+  | "/settings/chat-memory"
+  | "/settings/learn-tutor"
+  | "/settings/learn-knowledge"
   | "/settings/diffs"
   | "/settings/keybindings"
   | "/settings/snap-shot"
@@ -89,7 +94,11 @@ export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
   "/settings/projects": "Projects",
   "/settings/general": "General",
   "/settings/appearance": "Appearance",
-  "/settings/chat": "Chat",
+  "/settings/chat": "Composer", // universal-seam:settings-nav
+  "/settings/chat-assistant": "Assistant",
+  "/settings/chat-memory": "Memory",
+  "/settings/learn-tutor": "Tutor",
+  "/settings/learn-knowledge": "Knowledge",
   "/settings/diffs": "Diffs & pull requests",
   "/settings/keybindings": "Keybindings",
   "/settings/snap-shot": "SnapShots",
@@ -140,6 +149,15 @@ export const SETTINGS_NAV_GROUPS: ReadonlyArray<{
   {
     heading: "Code",
     paths: ["/settings/projects", "/settings/source-control", "/settings/worktrees"],
+  },
+  // universal-seam:settings-nav
+  {
+    heading: "Chat",
+    paths: ["/settings/chat-assistant", "/settings/chat-memory"],
+  },
+  {
+    heading: "Learn",
+    paths: ["/settings/learn-tutor", "/settings/learn-knowledge"],
   },
   {
     heading: "Connections",
@@ -1285,6 +1303,166 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: ["new 1password vault op cli account"],
     secretsFeatureOnly: true,
   },
+  // universal-seam:settings-nav
+  {
+    id: "chat-runs-on",
+    title: "Runs on",
+    to: "/settings/chat-assistant",
+    searchTerms: ["environment machine host assistant"],
+  },
+  {
+    id: "chat-default-model",
+    title: "Default Chat model",
+    to: "/settings/chat-assistant",
+    searchTerms: ["provider model assistant server default"],
+  },
+  {
+    id: "chat-memory-enabled",
+    title: "Remember things about me",
+    to: "/settings/chat-assistant",
+    searchTerms: ["memory pause remember facts"],
+  },
+  {
+    id: "chat-learn-signals",
+    title: "Suggest Learn topics",
+    to: "/settings/chat-assistant",
+    searchTerms: ["knowledge signals lessons concepts"],
+  },
+  {
+    id: "memory-runs-on",
+    title: "Runs on",
+    to: "/settings/chat-memory",
+    searchTerms: ["environment machine memory"],
+  },
+  {
+    id: "memory-known",
+    title: "What it knows about you",
+    to: "/settings/chat-memory",
+    searchTerms: ["profile memories facts search"],
+  },
+  {
+    id: "memory-extraction-model",
+    title: "Extraction model",
+    to: "/settings/chat-memory",
+    searchTerms: ["writing model extractor"],
+  },
+  {
+    id: "memory-schedule",
+    title: "Schedule",
+    to: "/settings/chat-memory",
+    searchTerms: ["hourly daily every 6 hours extraction off"],
+  },
+  {
+    id: "memory-run-now",
+    title: "Run now",
+    to: "/settings/chat-memory",
+    searchTerms: ["extract memories immediately"],
+  },
+  {
+    id: "memory-embedder",
+    title: "Embedding model",
+    to: "/settings/chat-memory",
+    searchTerms: ["vector gemma e5 qwen gemini dimensions download"],
+  },
+  {
+    id: "memory-gemini-key",
+    title: "Gemini API key",
+    to: "/settings/chat-memory",
+    targetId: "memory-embeddings",
+    searchTerms: ["embedding password cloud key"],
+  },
+  {
+    id: "memory-search-mode",
+    title: "Search mode",
+    to: "/settings/chat-memory",
+    searchTerms: ["vector keyword hybrid fts"],
+  },
+  {
+    id: "memory-sensitive",
+    title: "Sensitive topics",
+    to: "/settings/chat-memory",
+    targetId: "memory-privacy",
+    searchTerms: ["health religion politics sexuality gender identity opt in"],
+  },
+  {
+    id: "memory-topic-rules",
+    title: "Never remember anything about…",
+    to: "/settings/chat-memory",
+    searchTerms: ["topic rules keywords forget skip"],
+  },
+  {
+    id: "memory-purge",
+    title: "Delete all memories",
+    to: "/settings/chat-memory",
+    searchTerms: ["purge forget everything"],
+  },
+  {
+    id: "memory-health",
+    title: "Health",
+    to: "/settings/chat-memory",
+    searchTerms: ["last run database size index pending"],
+  },
+  {
+    id: "learn-runs-on",
+    title: "Runs on",
+    to: "/settings/learn-tutor",
+    searchTerms: ["environment machine host tutor"],
+  },
+  {
+    id: "learn-tutor-model",
+    title: "Tutor model",
+    to: "/settings/learn-tutor",
+    searchTerms: ["provider model lessons reviews"],
+  },
+  {
+    id: "learn-review-time",
+    title: "Daily review time",
+    to: "/settings/learn-tutor",
+    searchTerms: ["schedule clock off notification"],
+  },
+  {
+    id: "learn-review-notifications",
+    title: "Review notifications",
+    to: "/settings/learn-tutor",
+    searchTerms: ["due remind alert"],
+  },
+  {
+    id: "learn-retention",
+    title: "Desired retention",
+    to: "/settings/learn-tutor",
+    searchTerms: ["fsrs memory chance 0.9"],
+  },
+  {
+    id: "learn-use-memory",
+    title: "Use what Chat knows about me",
+    to: "/settings/learn-tutor",
+    searchTerms: ["profile memory tutor"],
+  },
+  {
+    id: "knowledge-runs-on",
+    title: "Runs on",
+    to: "/settings/learn-knowledge",
+    searchTerms: ["environment machine map"],
+  },
+  {
+    id: "learn-topics",
+    title: "Topics",
+    to: "/settings/learn-knowledge",
+    searchTerms: ["lines concepts due delete reset progress"],
+  },
+  {
+    id: "learn-export",
+    title: "Export map",
+    to: "/settings/learn-knowledge",
+    targetId: "learn-topics",
+    searchTerms: ["download json backup"],
+  },
+  {
+    id: "learn-suggestions",
+    title: "Suggested concepts",
+    to: "/settings/learn-knowledge",
+    searchTerms: ["accept dismiss signals"],
+  },
   {
     id: "archive",
     title: "Archived threads",
@@ -1304,6 +1482,11 @@ const SETTINGS_CATEGORY_SCOPES: Readonly<Record<SettingsPath, SettingsSearchScop
   "/settings/voice": null,
   "/settings/appearance": null,
   "/settings/chat": null,
+  // universal-seam:settings-nav
+  "/settings/chat-assistant": null,
+  "/settings/chat-memory": null,
+  "/settings/learn-tutor": null,
+  "/settings/learn-knowledge": null,
   "/settings/diffs": null,
   "/settings/snap-shot": null,
   "/settings/keybindings": null,

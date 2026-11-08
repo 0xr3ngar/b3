@@ -13,7 +13,7 @@ import * as Stream from "effect/Stream";
 
 import * as UniversalDb from "./db/UniversalDb.ts";
 
-export const DEFAULT_CHAT_SETTINGS: UniversalChatSettings = {
+const DEFAULT_CHAT_SETTINGS: UniversalChatSettings = {
   memoryEnabled: true,
   defaultModel: null,
   extractionModel: null,
@@ -24,7 +24,7 @@ export const DEFAULT_CHAT_SETTINGS: UniversalChatSettings = {
   learnSignals: true,
 };
 
-export const DEFAULT_LEARN_SETTINGS: UniversalLearnSettings = {
+const DEFAULT_LEARN_SETTINGS: UniversalLearnSettings = {
   tutorModel: null,
   dailyReviewTime: "09:00",
   reviewNotifications: true,

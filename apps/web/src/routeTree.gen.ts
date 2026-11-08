@@ -35,6 +35,8 @@ import { Route as ChatSettingsProvidersRouteImport } from './routes/_chat.settin
 import { Route as ChatSettingsProjectsRouteImport } from './routes/_chat.settings.projects'
 import { Route as ChatSettingsOpenSourceLicensesRouteImport } from './routes/_chat.settings.open-source-licenses'
 import { Route as ChatSettingsMaintenanceRouteImport } from './routes/_chat.settings.maintenance'
+import { Route as ChatSettingsLearnTutorRouteImport } from './routes/_chat.settings.learn-tutor'
+import { Route as ChatSettingsLearnKnowledgeRouteImport } from './routes/_chat.settings.learn-knowledge'
 import { Route as ChatSettingsLabsRouteImport } from './routes/_chat.settings.labs'
 import { Route as ChatSettingsKeybindingsRouteImport } from './routes/_chat.settings.keybindings'
 import { Route as ChatSettingsIntegrationsRouteImport } from './routes/_chat.settings.integrations'
@@ -43,6 +45,8 @@ import { Route as ChatSettingsDiffsRouteImport } from './routes/_chat.settings.d
 import { Route as ChatSettingsDiagnosticsRouteImport } from './routes/_chat.settings.diagnostics'
 import { Route as ChatSettingsDevicesRouteImport } from './routes/_chat.settings.devices'
 import { Route as ChatSettingsConnectionsRouteImport } from './routes/_chat.settings.connections'
+import { Route as ChatSettingsChatMemoryRouteImport } from './routes/_chat.settings.chat-memory'
+import { Route as ChatSettingsChatAssistantRouteImport } from './routes/_chat.settings.chat-assistant'
 import { Route as ChatSettingsChatRouteImport } from './routes/_chat.settings.chat'
 import { Route as ChatSettingsBrowserRouteImport } from './routes/_chat.settings.browser'
 import { Route as ChatSettingsBetaRouteImport } from './routes/_chat.settings.beta'
@@ -186,6 +190,17 @@ const ChatSettingsMaintenanceRoute = ChatSettingsMaintenanceRouteImport.update({
   path: '/maintenance',
   getParentRoute: () => ChatSettingsRoute,
 } as any)
+const ChatSettingsLearnTutorRoute = ChatSettingsLearnTutorRouteImport.update({
+  id: '/learn-tutor',
+  path: '/learn-tutor',
+  getParentRoute: () => ChatSettingsRoute,
+} as any)
+const ChatSettingsLearnKnowledgeRoute =
+  ChatSettingsLearnKnowledgeRouteImport.update({
+    id: '/learn-knowledge',
+    path: '/learn-knowledge',
+    getParentRoute: () => ChatSettingsRoute,
+  } as any)
 const ChatSettingsLabsRoute = ChatSettingsLabsRouteImport.update({
   id: '/labs',
   path: '/labs',
@@ -227,6 +242,17 @@ const ChatSettingsConnectionsRoute = ChatSettingsConnectionsRouteImport.update({
   path: '/connections',
   getParentRoute: () => ChatSettingsRoute,
 } as any)
+const ChatSettingsChatMemoryRoute = ChatSettingsChatMemoryRouteImport.update({
+  id: '/chat-memory',
+  path: '/chat-memory',
+  getParentRoute: () => ChatSettingsRoute,
+} as any)
+const ChatSettingsChatAssistantRoute =
+  ChatSettingsChatAssistantRouteImport.update({
+    id: '/chat-assistant',
+    path: '/chat-assistant',
+    getParentRoute: () => ChatSettingsRoute,
+  } as any)
 const ChatSettingsChatRoute = ChatSettingsChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -296,6 +322,8 @@ export interface FileRoutesByFullPath {
   '/settings/beta': typeof ChatSettingsBetaRoute
   '/settings/browser': typeof ChatSettingsBrowserRoute
   '/settings/chat': typeof ChatSettingsChatRoute
+  '/settings/chat-assistant': typeof ChatSettingsChatAssistantRoute
+  '/settings/chat-memory': typeof ChatSettingsChatMemoryRoute
   '/settings/connections': typeof ChatSettingsConnectionsRoute
   '/settings/devices': typeof ChatSettingsDevicesRoute
   '/settings/diagnostics': typeof ChatSettingsDiagnosticsRoute
@@ -304,6 +332,8 @@ export interface FileRoutesByFullPath {
   '/settings/integrations': typeof ChatSettingsIntegrationsRoute
   '/settings/keybindings': typeof ChatSettingsKeybindingsRoute
   '/settings/labs': typeof ChatSettingsLabsRoute
+  '/settings/learn-knowledge': typeof ChatSettingsLearnKnowledgeRoute
+  '/settings/learn-tutor': typeof ChatSettingsLearnTutorRoute
   '/settings/maintenance': typeof ChatSettingsMaintenanceRoute
   '/settings/open-source-licenses': typeof ChatSettingsOpenSourceLicensesRoute
   '/settings/projects': typeof ChatSettingsProjectsRoute
@@ -340,6 +370,8 @@ export interface FileRoutesByTo {
   '/settings/beta': typeof ChatSettingsBetaRoute
   '/settings/browser': typeof ChatSettingsBrowserRoute
   '/settings/chat': typeof ChatSettingsChatRoute
+  '/settings/chat-assistant': typeof ChatSettingsChatAssistantRoute
+  '/settings/chat-memory': typeof ChatSettingsChatMemoryRoute
   '/settings/connections': typeof ChatSettingsConnectionsRoute
   '/settings/devices': typeof ChatSettingsDevicesRoute
   '/settings/diagnostics': typeof ChatSettingsDiagnosticsRoute
@@ -348,6 +380,8 @@ export interface FileRoutesByTo {
   '/settings/integrations': typeof ChatSettingsIntegrationsRoute
   '/settings/keybindings': typeof ChatSettingsKeybindingsRoute
   '/settings/labs': typeof ChatSettingsLabsRoute
+  '/settings/learn-knowledge': typeof ChatSettingsLearnKnowledgeRoute
+  '/settings/learn-tutor': typeof ChatSettingsLearnTutorRoute
   '/settings/maintenance': typeof ChatSettingsMaintenanceRoute
   '/settings/open-source-licenses': typeof ChatSettingsOpenSourceLicensesRoute
   '/settings/projects': typeof ChatSettingsProjectsRoute
@@ -386,6 +420,8 @@ export interface FileRoutesById {
   '/_chat/settings/beta': typeof ChatSettingsBetaRoute
   '/_chat/settings/browser': typeof ChatSettingsBrowserRoute
   '/_chat/settings/chat': typeof ChatSettingsChatRoute
+  '/_chat/settings/chat-assistant': typeof ChatSettingsChatAssistantRoute
+  '/_chat/settings/chat-memory': typeof ChatSettingsChatMemoryRoute
   '/_chat/settings/connections': typeof ChatSettingsConnectionsRoute
   '/_chat/settings/devices': typeof ChatSettingsDevicesRoute
   '/_chat/settings/diagnostics': typeof ChatSettingsDiagnosticsRoute
@@ -394,6 +430,8 @@ export interface FileRoutesById {
   '/_chat/settings/integrations': typeof ChatSettingsIntegrationsRoute
   '/_chat/settings/keybindings': typeof ChatSettingsKeybindingsRoute
   '/_chat/settings/labs': typeof ChatSettingsLabsRoute
+  '/_chat/settings/learn-knowledge': typeof ChatSettingsLearnKnowledgeRoute
+  '/_chat/settings/learn-tutor': typeof ChatSettingsLearnTutorRoute
   '/_chat/settings/maintenance': typeof ChatSettingsMaintenanceRoute
   '/_chat/settings/open-source-licenses': typeof ChatSettingsOpenSourceLicensesRoute
   '/_chat/settings/projects': typeof ChatSettingsProjectsRoute
@@ -432,6 +470,8 @@ export interface FileRouteTypes {
     | '/settings/beta'
     | '/settings/browser'
     | '/settings/chat'
+    | '/settings/chat-assistant'
+    | '/settings/chat-memory'
     | '/settings/connections'
     | '/settings/devices'
     | '/settings/diagnostics'
@@ -440,6 +480,8 @@ export interface FileRouteTypes {
     | '/settings/integrations'
     | '/settings/keybindings'
     | '/settings/labs'
+    | '/settings/learn-knowledge'
+    | '/settings/learn-tutor'
     | '/settings/maintenance'
     | '/settings/open-source-licenses'
     | '/settings/projects'
@@ -476,6 +518,8 @@ export interface FileRouteTypes {
     | '/settings/beta'
     | '/settings/browser'
     | '/settings/chat'
+    | '/settings/chat-assistant'
+    | '/settings/chat-memory'
     | '/settings/connections'
     | '/settings/devices'
     | '/settings/diagnostics'
@@ -484,6 +528,8 @@ export interface FileRouteTypes {
     | '/settings/integrations'
     | '/settings/keybindings'
     | '/settings/labs'
+    | '/settings/learn-knowledge'
+    | '/settings/learn-tutor'
     | '/settings/maintenance'
     | '/settings/open-source-licenses'
     | '/settings/projects'
@@ -521,6 +567,8 @@ export interface FileRouteTypes {
     | '/_chat/settings/beta'
     | '/_chat/settings/browser'
     | '/_chat/settings/chat'
+    | '/_chat/settings/chat-assistant'
+    | '/_chat/settings/chat-memory'
     | '/_chat/settings/connections'
     | '/_chat/settings/devices'
     | '/_chat/settings/diagnostics'
@@ -529,6 +577,8 @@ export interface FileRouteTypes {
     | '/_chat/settings/integrations'
     | '/_chat/settings/keybindings'
     | '/_chat/settings/labs'
+    | '/_chat/settings/learn-knowledge'
+    | '/_chat/settings/learn-tutor'
     | '/_chat/settings/maintenance'
     | '/_chat/settings/open-source-licenses'
     | '/_chat/settings/projects'
@@ -739,6 +789,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatSettingsMaintenanceRouteImport
       parentRoute: typeof ChatSettingsRoute
     }
+    '/_chat/settings/learn-tutor': {
+      id: '/_chat/settings/learn-tutor'
+      path: '/learn-tutor'
+      fullPath: '/settings/learn-tutor'
+      preLoaderRoute: typeof ChatSettingsLearnTutorRouteImport
+      parentRoute: typeof ChatSettingsRoute
+    }
+    '/_chat/settings/learn-knowledge': {
+      id: '/_chat/settings/learn-knowledge'
+      path: '/learn-knowledge'
+      fullPath: '/settings/learn-knowledge'
+      preLoaderRoute: typeof ChatSettingsLearnKnowledgeRouteImport
+      parentRoute: typeof ChatSettingsRoute
+    }
     '/_chat/settings/labs': {
       id: '/_chat/settings/labs'
       path: '/labs'
@@ -793,6 +857,20 @@ declare module '@tanstack/react-router' {
       path: '/connections'
       fullPath: '/settings/connections'
       preLoaderRoute: typeof ChatSettingsConnectionsRouteImport
+      parentRoute: typeof ChatSettingsRoute
+    }
+    '/_chat/settings/chat-memory': {
+      id: '/_chat/settings/chat-memory'
+      path: '/chat-memory'
+      fullPath: '/settings/chat-memory'
+      preLoaderRoute: typeof ChatSettingsChatMemoryRouteImport
+      parentRoute: typeof ChatSettingsRoute
+    }
+    '/_chat/settings/chat-assistant': {
+      id: '/_chat/settings/chat-assistant'
+      path: '/chat-assistant'
+      fullPath: '/settings/chat-assistant'
+      preLoaderRoute: typeof ChatSettingsChatAssistantRouteImport
       parentRoute: typeof ChatSettingsRoute
     }
     '/_chat/settings/chat': {
@@ -869,6 +947,8 @@ interface ChatSettingsRouteChildren {
   ChatSettingsBetaRoute: typeof ChatSettingsBetaRoute
   ChatSettingsBrowserRoute: typeof ChatSettingsBrowserRoute
   ChatSettingsChatRoute: typeof ChatSettingsChatRoute
+  ChatSettingsChatAssistantRoute: typeof ChatSettingsChatAssistantRoute
+  ChatSettingsChatMemoryRoute: typeof ChatSettingsChatMemoryRoute
   ChatSettingsConnectionsRoute: typeof ChatSettingsConnectionsRoute
   ChatSettingsDevicesRoute: typeof ChatSettingsDevicesRoute
   ChatSettingsDiagnosticsRoute: typeof ChatSettingsDiagnosticsRoute
@@ -877,6 +957,8 @@ interface ChatSettingsRouteChildren {
   ChatSettingsIntegrationsRoute: typeof ChatSettingsIntegrationsRoute
   ChatSettingsKeybindingsRoute: typeof ChatSettingsKeybindingsRoute
   ChatSettingsLabsRoute: typeof ChatSettingsLabsRoute
+  ChatSettingsLearnKnowledgeRoute: typeof ChatSettingsLearnKnowledgeRoute
+  ChatSettingsLearnTutorRoute: typeof ChatSettingsLearnTutorRoute
   ChatSettingsMaintenanceRoute: typeof ChatSettingsMaintenanceRoute
   ChatSettingsOpenSourceLicensesRoute: typeof ChatSettingsOpenSourceLicensesRoute
   ChatSettingsProjectsRoute: typeof ChatSettingsProjectsRoute
@@ -899,6 +981,8 @@ const ChatSettingsRouteChildren: ChatSettingsRouteChildren = {
   ChatSettingsBetaRoute: ChatSettingsBetaRoute,
   ChatSettingsBrowserRoute: ChatSettingsBrowserRoute,
   ChatSettingsChatRoute: ChatSettingsChatRoute,
+  ChatSettingsChatAssistantRoute: ChatSettingsChatAssistantRoute,
+  ChatSettingsChatMemoryRoute: ChatSettingsChatMemoryRoute,
   ChatSettingsConnectionsRoute: ChatSettingsConnectionsRoute,
   ChatSettingsDevicesRoute: ChatSettingsDevicesRoute,
   ChatSettingsDiagnosticsRoute: ChatSettingsDiagnosticsRoute,
@@ -907,6 +991,8 @@ const ChatSettingsRouteChildren: ChatSettingsRouteChildren = {
   ChatSettingsIntegrationsRoute: ChatSettingsIntegrationsRoute,
   ChatSettingsKeybindingsRoute: ChatSettingsKeybindingsRoute,
   ChatSettingsLabsRoute: ChatSettingsLabsRoute,
+  ChatSettingsLearnKnowledgeRoute: ChatSettingsLearnKnowledgeRoute,
+  ChatSettingsLearnTutorRoute: ChatSettingsLearnTutorRoute,
   ChatSettingsMaintenanceRoute: ChatSettingsMaintenanceRoute,
   ChatSettingsOpenSourceLicensesRoute: ChatSettingsOpenSourceLicensesRoute,
   ChatSettingsProjectsRoute: ChatSettingsProjectsRoute,
