@@ -12,6 +12,7 @@ import * as Schema from "effect/Schema";
 
 import * as Orchestrator from "../../orchestration-v2/Orchestrator.ts";
 import * as ThreadLaunchService from "../../orchestration-v2/ThreadLaunchService.ts";
+import * as ProviderRegistry from "../../provider/ProviderRegistry.ts";
 import * as ThreadManagementService from "../../orchestration-v2/ThreadManagementService.ts";
 import * as ServerSettings from "../../serverSettings.ts";
 import * as UniversalDb from "../db/UniversalDb.ts";
@@ -63,6 +64,7 @@ const makeDeps = (calls: RecordedCalls) =>
     layerThreads(calls),
     Layer.mock(ThreadLaunchService.ThreadLaunchService, {}),
     layerServerSettings,
+    Layer.mock(ProviderRegistry.ProviderRegistry, { getProviders: Effect.succeed([]) }),
   );
 
 const withLearn = <A, E>(

@@ -44,6 +44,17 @@ const ICON_PATHS: Record<string, ReadonlyArray<{ tag: string; attrs: Record<stri
       },
     },
   ],
+  // universal-seam:learn-this
+  "graduation-cap": [
+    {
+      tag: "path",
+      attrs: {
+        d: "M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z",
+      },
+    },
+    { tag: "path", attrs: { d: "M22 10v6" } },
+    { tag: "path", attrs: { d: "M6 12.5V16a6 3 0 0 0 12 0v-3.5" } },
+  ],
   "git-branch": [
     { tag: "line", attrs: { x1: "6", x2: "6", y1: "3", y2: "15" } },
     { tag: "circle", attrs: { cx: "18", cy: "6", r: "3" } },

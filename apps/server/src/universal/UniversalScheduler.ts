@@ -1,5 +1,4 @@
 import {
-  type ModelSelection,
   ScheduledTaskId,
   UNIVERSAL_SPACE_PROJECT_IDS,
   type UniversalSettings,
@@ -9,9 +8,11 @@ import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 
+import * as ProviderRegistry from "../provider/ProviderRegistry.ts";
 import * as ScheduledTaskService from "../scheduledTasks/ScheduledTaskService.ts";
 import * as ServerSettings from "../serverSettings.ts";
 import * as UniversalDb from "./db/UniversalDb.ts";
+import { pickRunnableModel } from "./modelChoice.ts";
 
 const MEMORY_TASK_KEY = "task.memory";
 const REVIEW_TASK_KEY = "task.review";
@@ -39,6 +40,7 @@ const make = Effect.gen(function* () {
   const db = yield* UniversalDb.UniversalDb;
   const tasks = yield* ScheduledTaskService.ScheduledTaskService;
   const serverSettings = yield* ServerSettings.ServerSettingsService;
+  const providers = yield* ProviderRegistry.ProviderRegistry;
 
   const readKey = (key: string) =>
     db
@@ -60,10 +62,13 @@ const make = Effect.gen(function* () {
       )
       .pipe(Effect.ignore);
 
-  const fallbackModel = serverSettings.getSettings.pipe(
-    Effect.map((settings): ModelSelection | null => settings.textGenerationModelSelection ?? settings.defaultModelSelection),
-    Effect.orElseSucceed(() => null),
-  );
+  const fallbackModel = Effect.gen(function* () {
+    const settings = yield* serverSettings.getSettings.pipe(Effect.orElseSucceed(() => null));
+    return pickRunnableModel(
+      [settings?.textGenerationModelSelection, settings?.defaultModelSelection],
+      yield* providers.getProviders,
+    );
+  });
 
   const existingTask = Effect.fn("UniversalScheduler.existingTask")(function* (key: string) {
     const id = yield* readKey(key);
@@ -78,7 +83,9 @@ const make = Effect.gen(function* () {
     yield* tasks.setEnabled({ id: task.id, enabled: false }).pipe(Effect.ignore);
   });
 
-  const syncMemory = Effect.fn("UniversalScheduler.syncMemory")(function* (settings: UniversalSettings) {
+  const syncMemory = Effect.fn("UniversalScheduler.syncMemory")(function* (
+    settings: UniversalSettings,
+  ) {
     const interval = settings.chat.extractionInterval;
     if (!settings.chat.memoryEnabled || interval === "off") return yield* disable(MEMORY_TASK_KEY);
     const model = settings.chat.extractionModel ?? (yield* fallbackModel);
@@ -102,7 +109,9 @@ const make = Effect.gen(function* () {
     yield* writeKey(MEMORY_TASK_KEY, saved.task.id);
   });
 
-  const syncReview = Effect.fn("UniversalScheduler.syncReview")(function* (settings: UniversalSettings) {
+  const syncReview = Effect.fn("UniversalScheduler.syncReview")(function* (
+    settings: UniversalSettings,
+  ) {
     const time = settings.learn.dailyReviewTime;
     if (time === null) return yield* disable(REVIEW_TASK_KEY);
     const model = settings.learn.tutorModel ?? (yield* fallbackModel);
@@ -130,10 +139,14 @@ const make = Effect.gen(function* () {
     Effect.all(
       [
         syncMemory(settings).pipe(
-          Effect.catchCause((cause) => Effect.logWarning("b3 could not schedule memory extraction", { cause })),
+          Effect.catchCause((cause) =>
+            Effect.logWarning("b3 could not schedule memory extraction", { cause }),
+          ),
         ),
         syncReview(settings).pipe(
-          Effect.catchCause((cause) => Effect.logWarning("b3 could not schedule the daily review", { cause })),
+          Effect.catchCause((cause) =>
+            Effect.logWarning("b3 could not schedule the daily review", { cause }),
+          ),
         ),
       ],
       { discard: true },

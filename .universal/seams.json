@@ -18,6 +18,7 @@
     "packages/client-runtime/src/mcpApps/host.ts": "mcp-app-accent",
     "packages/client-runtime/package.json": "exports",
     "apps/web/src/components/Sidebar.tsx": "sidebar-space",
+    "apps/web/src/contextMenuFallback.ts": "learn-this",
     "apps/web/src/components/settings/settingsSearch.ts": "settings-nav",
     "apps/web/package.json": "dependencies",
     "apps/mobile/package.json": "dependencies",
