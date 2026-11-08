@@ -1,0 +1,2651 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn widget preview</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #09090b;
+        --column: #101013;
+        --fg: #f4f4f5;
+        --mf: #a1a1aa;
+        --border: rgba(255, 255, 255, 0.1);
+        --card: #18181b;
+        --accent: #818cf8;
+        --accent-fg: #0b1020;
+        --shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.7);
+      }
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --bg: #ececee;
+        --column: #f7f7f8;
+        --fg: #18181b;
+        --mf: #71717a;
+        --border: #e4e4e7;
+        --card: #ffffff;
+        --accent: #4f46e5;
+        --accent-fg: #ffffff;
+        --shadow: 0 18px 40px -24px rgba(24, 24, 27, 0.35);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+      body {
+        background:
+          radial-gradient(
+            900px 420px at 50% -10%,
+            color-mix(in srgb, var(--accent) 16%, transparent),
+            transparent 70%
+          ),
+          var(--bg);
+        color: var(--fg);
+        font:
+          14px/1.5 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: min(880px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 22px 0 14px;
+      }
+      .brand {
+        font-size: 15px;
+        letter-spacing: -0.03em;
+      }
+      .brand b {
+        font-weight: 800;
+      }
+      .brand span {
+        color: var(--mf);
+        font-weight: 500;
+      }
+      .seg {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        padding: 3px;
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--fg) 6%, transparent);
+      }
+      .seg button,
+      .tools button {
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      .seg button {
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 8px;
+        color: var(--mf);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .seg button[aria-pressed="true"] {
+        background: var(--card);
+        color: var(--fg);
+        box-shadow:
+          0 0 0 1px var(--border),
+          0 1px 2px rgba(0, 0, 0, 0.12);
+      }
+      .tools {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .tools button {
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 8px;
+        box-shadow: 0 0 0 1px var(--border);
+        background: var(--card);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .stage {
+        width: min(880px, calc(100% - 32px));
+        margin: 0 auto 40px;
+      }
+      .thread {
+        width: min(680px, 100%);
+        margin: 8px auto 0;
+        padding: 22px 22px 18px;
+        border-radius: 18px;
+        background: var(--column);
+        box-shadow:
+          var(--shadow),
+          0 0 0 1px var(--border);
+      }
+      :root[data-phone="1"] .thread {
+        width: min(390px, 100%);
+        border-radius: 28px;
+        padding: 18px 14px 14px;
+      }
+      .lead {
+        margin: 0 0 14px;
+        color: var(--mf);
+        font-size: 13.5px;
+      }
+      .lead b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      iframe {
+        display: block;
+        width: 100%;
+        height: 180px;
+        border: 0;
+        background: transparent;
+      }
+      .foot {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        color: var(--mf);
+        font-size: 12px;
+      }
+      .trace {
+        margin-left: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      @media (max-width: 720px) {
+        .top {
+          flex-wrap: wrap;
+        }
+        .tools {
+          margin-left: 0;
+        }
+        .trace {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand"><b>T3</b> <span>Learn</span></div>
+      <div class="seg" role="tablist" aria-label="Widget">
+        <button type="button" data-kind="check" role="tab">Check</button>
+        <button type="button" data-kind="review" role="tab">Review</button>
+        <button type="button" data-kind="session-end" role="tab">Session end</button>
+      </div>
+      <div class="tools">
+        <button type="button" id="phone">Phone</button>
+        <button type="button" id="theme">Light</button>
+      </div>
+    </header>
+    <main class="stage">
+      <section class="thread">
+        <p class="lead" id="lead"></p>
+        <iframe
+          id="frame"
+          sandbox="allow-scripts"
+          title="Learn widget"
+          srcdoc='&lt;!doctype html&gt;
+&lt;html lang="en" data-theme="dark"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Learn&lt;/title&gt;
+    &lt;style&gt;
+      :root {
+        color-scheme: dark;
+        --bg-fb: #09090b;
+        --card-fb: #111113;
+        --muted-fb: #1c1c1f;
+        --fg-fb: #f4f4f5;
+        --mf-fb: #a1a1aa;
+        --border-fb: #2a2a2e;
+        --input-fb: #3f3f46;
+        --danger-fb: #fca5a5;
+        --danger-bg-fb: rgba(248, 113, 113, 0.14);
+        --success-fb: #86efac;
+        --warning-fb: #fcd34d;
+        --warning-bg-fb: rgba(251, 191, 36, 0.14);
+        --info-fb: #93c5fd;
+        --line-success: #3ddc84;
+        --line-rust: #e08a6d;
+        --line-span: #c084fc;
+        --line-warning: #fbbf24;
+      }
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --bg-fb: #fafafa;
+        --card-fb: #ffffff;
+        --muted-fb: #f4f4f5;
+        --fg-fb: #18181b;
+        --mf-fb: #71717a;
+        --border-fb: #e4e4e7;
+        --input-fb: #d4d4d8;
+        --danger-fb: #dc2626;
+        --danger-bg-fb: rgba(220, 38, 38, 0.08);
+        --success-fb: #15803d;
+        --warning-fb: #b45309;
+        --warning-bg-fb: rgba(217, 119, 6, 0.12);
+        --info-fb: #1d4ed8;
+        --line-success: #15803d;
+        --line-rust: #c2410c;
+        --line-span: #7c3aed;
+        --line-warning: #d97706;
+      }
+      :root {
+        --bg: var(--color-background-primary, var(--bg-fb));
+        --card: var(--color-background-secondary, var(--card-fb));
+        --muted: var(--color-background-tertiary, var(--muted-fb));
+        --fg: var(--color-text-primary, var(--fg-fb));
+        --mf: var(--color-text-secondary, var(--mf-fb));
+        --border: var(--color-border-primary, var(--border-fb));
+        --input: var(--color-border-secondary, var(--input-fb));
+        --danger: var(--color-text-danger, var(--danger-fb));
+        --danger-line: var(--color-border-danger, var(--danger-fb));
+        --danger-bg: var(--color-background-danger, var(--danger-bg-fb));
+        --success: var(--color-text-success, var(--success-fb));
+        --warning: var(--color-text-warning, var(--warning-fb));
+        --warning-bg: var(--color-background-warning, var(--warning-bg-fb));
+        --info: var(--color-text-info, var(--info-fb));
+        --accent: var(--t3-primary, #6366f1);
+        --accent-fg: var(--t3-primary-foreground, #fff);
+        --font: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+        --mono: var(--font-mono, ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace);
+        --radius: var(--border-radius-md, 10px);
+        --ring: var(--color-ring-primary, var(--t3-primary, #6366f1));
+        --line-primary: var(--t3-primary, #6366f1);
+        --due: var(--line-warning);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        background: transparent;
+      }
+      body {
+        margin: 0;
+        padding: 1px;
+        color: var(--fg);
+        background: transparent;
+        font: 14px/1.5 var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: default;
+      }
+      :focus {
+        outline: none;
+      }
+      :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: -2px;
+      }
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        border: 0;
+      }
+      .card {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 12px;
+        padding: 12px 14px 14px;
+      }
+      .enter {
+        animation: enter 200ms ease;
+      }
+      @keyframes enter {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--mf);
+        font-size: 12.5px;
+        min-height: 20px;
+      }
+      .progress {
+        flex: 1;
+        min-width: 72px;
+      }
+      .progress svg,
+      .run svg {
+        display: block;
+      }
+      .count {
+        white-space: nowrap;
+      }
+      .line {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 42%;
+        color: var(--fg);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .line i {
+        width: 14px;
+        height: 4px;
+        border-radius: 2px;
+        flex: none;
+      }
+      .stem {
+        margin: 12px 0 0;
+        font-size: 16.5px;
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: -0.005em;
+      }
+      .blank {
+        display: inline-block;
+        width: 8ch;
+        min-width: 6ch;
+        max-width: 100%;
+        margin: 0 2px;
+        padding: 0 2px 1px;
+        border: 0;
+        border-bottom: 1.5px solid var(--accent);
+        border-radius: 0;
+        background: transparent;
+        font-weight: 500;
+      }
+      .field,
+      .area {
+        width: 100%;
+        margin-top: 6px;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        box-shadow: 0 0 0 1px var(--input);
+        font-size: 16px;
+        line-height: 1.45;
+      }
+      .area {
+        display: block;
+        min-height: 44px;
+        max-height: 140px;
+        resize: none;
+        overflow: auto;
+      }
+      .lbl {
+        display: block;
+        margin-top: 10px;
+        color: var(--mf);
+        font-size: 12.5px;
+      }
+      .opts {
+        display: grid;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .opt {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        min-height: 36px;
+        padding: 7px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        box-shadow: 0 0 0 1px var(--border);
+        text-align: left;
+        line-height: 1.35;
+      }
+      .opt::before {
+        content: "";
+        width: 14px;
+        height: 14px;
+        margin-top: 2px;
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 1.5px var(--mf);
+        flex: none;
+      }
+      .opt[aria-checked="true"] {
+        box-shadow: 0 0 0 1.5px var(--accent);
+        background: color-mix(in srgb, var(--accent) 10%, transparent);
+      }
+      .opt[aria-checked="true"]::before {
+        box-shadow: inset 0 0 0 4px var(--accent);
+      }
+      .opt kbd,
+      .grade kbd {
+        font: 500 11px var(--mono);
+        color: var(--mf);
+        flex: none;
+      }
+      .conf {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        margin-top: 10px;
+        padding: 3px;
+        border-radius: 9px;
+        background: color-mix(in srgb, var(--fg) 6%, transparent);
+      }
+      .conf button {
+        height: 28px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--mf);
+        font-size: 12.5px;
+        font-weight: 500;
+      }
+      .conf button[aria-checked="true"] {
+        background: var(--card);
+        color: var(--fg);
+        box-shadow:
+          0 0 0 1px var(--border),
+          0 1px 2px rgba(0, 0, 0, 0.12);
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .actions .primary,
+      .actions .next {
+        margin-left: auto;
+      }
+      .end .actions .primary {
+        margin-left: 0;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 6px 12px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        box-shadow: 0 0 0 1px var(--border);
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+      }
+      .btn.primary {
+        background: var(--t3-primary, #6366f1);
+        color: var(--t3-primary-foreground, #fff);
+        box-shadow: none;
+      }
+      .btn:disabled,
+      .opt:disabled,
+      .grade:disabled,
+      .conf button:disabled {
+        opacity: 0.45;
+      }
+      .quiet {
+        border: 0;
+        background: none;
+        box-shadow: none;
+        color: var(--mf);
+        font-size: 12.5px;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        padding: 0;
+        min-height: 0;
+      }
+      .hint,
+      .warn,
+      .note,
+      .err,
+      .notice {
+        margin-top: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 12.5px;
+        line-height: 1.45;
+      }
+      .hint {
+        background: var(--muted);
+      }
+      .warn {
+        background: var(--warning-bg);
+      }
+      .note,
+      .err {
+        background: var(--danger-bg);
+      }
+      .note b,
+      .err {
+        color: var(--danger);
+      }
+      .note b {
+        font-weight: 600;
+      }
+      .notice {
+        background: var(--muted);
+        color: var(--fg);
+      }
+      .yours {
+        margin: 10px 0 0;
+        color: var(--mf);
+        font-size: 13px;
+      }
+      .result {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed var(--border);
+      }
+      .outcome {
+        margin: 0;
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .outcome.correct {
+        color: var(--success);
+      }
+      .outcome.partial {
+        color: var(--warning);
+      }
+      .outcome.incorrect {
+        color: var(--danger);
+      }
+      .result p {
+        margin: 8px 0 0;
+      }
+      .answer {
+        color: var(--fg);
+      }
+      .grades {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .grade {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-height: 46px;
+        padding: 7px 8px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        box-shadow: 0 0 0 1px var(--border);
+        text-align: left;
+        font-size: 13px;
+        font-weight: 500;
+        transition:
+          background 180ms ease,
+          color 180ms ease,
+          box-shadow 180ms ease;
+      }
+      .grade small {
+        font-size: 11.5px;
+        font-weight: 400;
+        color: var(--mf);
+      }
+      .grade kbd {
+        position: absolute;
+        right: 7px;
+        top: 6px;
+      }
+      .grade.again:not(.on) {
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--danger-line) 45%, var(--border));
+      }
+      .grade.again:not(.on) .name {
+        color: var(--danger);
+      }
+      .grade.on {
+        background: var(--t3-primary, #6366f1);
+        color: var(--t3-primary-foreground, #fff);
+        box-shadow: none;
+      }
+      .grade.on small,
+      .grade.on kbd {
+        color: color-mix(in srgb, var(--t3-primary-foreground, #fff) 72%, transparent);
+      }
+      .grade-note {
+        margin: 8px 0 0;
+        color: var(--mf);
+        font-size: 12px;
+      }
+      .hints {
+        margin: 8px 0 0;
+        color: var(--mf);
+        font-size: 12px;
+      }
+      .end h1,
+      .done h1 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .sub {
+        margin: 2px 0 0;
+        color: var(--mf);
+        font-size: 13px;
+      }
+      .run {
+        margin-top: 10px;
+        overflow-x: auto;
+      }
+      .diff {
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .diff-h {
+        padding: 7px 10px;
+        border-bottom: 1px solid var(--border);
+        background: color-mix(in srgb, var(--muted) 80%, transparent);
+        font-size: 12.5px;
+        font-weight: 500;
+      }
+      .diff-row {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        padding: 3px 10px 3px 0;
+        font: 12.5px/1.45 var(--mono);
+      }
+      .diff-row b {
+        text-align: center;
+        font-weight: 600;
+      }
+      .diff-row span {
+        min-width: 0;
+      }
+      .diff-row em {
+        display: block;
+        color: var(--mf);
+        font-family: var(--font);
+        font-style: normal;
+        font-size: 11.5px;
+      }
+      .diff-row.learned {
+        background: color-mix(in srgb, var(--success) 12%, transparent);
+      }
+      .diff-row.learned b {
+        color: var(--success);
+      }
+      .diff-row.stronger b {
+        color: var(--info);
+      }
+      .diff-row.fixed {
+        background: color-mix(in srgb, var(--danger) 10%, transparent);
+      }
+      .diff-row.fixed b {
+        color: var(--danger);
+      }
+      .diff-row.weaker b {
+        color: var(--warning);
+      }
+      .sched {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 6px 12px;
+        margin: 12px 0 0;
+        font-size: 13px;
+      }
+      .sched dt {
+        color: var(--mf);
+      }
+      .sched dd {
+        margin: 0;
+      }
+      .unlocked {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      .unlocked b {
+        font-weight: 600;
+      }
+      svg .lbl {
+        font: 500 10px var(--font);
+        fill: var(--fg);
+      }
+      svg .sub {
+        font: 500 9px var(--font);
+        fill: var(--mf);
+      }
+      .wait {
+        color: var(--mf);
+      }
+      @media (max-width: 420px) {
+        .card {
+          padding: 12px;
+        }
+        .stem {
+          font-size: 16px;
+        }
+        .line {
+          max-width: 34%;
+        }
+        .grade {
+          align-items: center;
+          padding: 6px 4px;
+          text-align: center;
+          font-size: 12.5px;
+        }
+        .grade kbd {
+          display: none;
+        }
+        .sched {
+          grid-template-columns: 1fr;
+          gap: 2px;
+        }
+        .sched dd {
+          margin-bottom: 6px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .enter {
+          animation: none;
+        }
+        .grade {
+          transition: none;
+        }
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="app" role="region" aria-label="Learn card"&gt;
+      &lt;div class="card wait"&gt;Waiting for the card…&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div id="live" class="sr" aria-live="polite"&gt;&lt;/div&gt;
+    &lt;script&gt;
+      (function () {
+        var PROTOCOL = "2026-01-26";
+        var RATINGS = ["again", "hard", "good", "easy"];
+        var RATING_LABEL = { again: "Again", hard: "Hard", good: "Good", easy: "Easy" };
+        var CONF = [
+          { id: "low", label: "Guessing" },
+          { id: "medium", label: "Unsure" },
+          { id: "high", label: "Sure" },
+        ];
+        var DIFF = { learned: "+", stronger: "↑", fixed: "−", weaker: "↓" };
+
+        var payload = null;
+        var states = [];
+        var position = 0;
+        var finished = false;
+        var draft = { text: "", choice: null, confidence: null };
+        var busy = false;
+        var errorText = null;
+        var lastRetry = null;
+        var notice = null;
+        var doneAction = null;
+        var answerBlurred = false;
+        var rpcId = 0;
+        var pending = new Map();
+        var appliedVars = [];
+        var lastW = -1;
+        var lastH = -1;
+        var lastLive = "";
+        var sizeQueued = false;
+
+        function post(message) {
+          if (window.parent !== window) window.parent.postMessage(message, "*");
+        }
+
+        function request(method, params) {
+          var id = ++rpcId;
+          return new Promise(function (resolve, reject) {
+            pending.set(id, { resolve: resolve, reject: reject });
+            post({ jsonrpc: "2.0", id: id, method: method, params: params });
+          });
+        }
+
+        function notify(method, params) {
+          post({ jsonrpc: "2.0", method: method, params: params });
+        }
+
+        function textOf(result) {
+          var block = result &amp;&amp; Array.isArray(result.content) ? result.content[0] : null;
+          if (block &amp;&amp; block.type === "text" &amp;&amp; typeof block.text === "string") return block.text;
+          return "";
+        }
+
+        function unwrapTool(result) {
+          if (!result || typeof result !== "object") throw new Error("Empty tool result.");
+          if (result.isError === true) throw new Error(textOf(result) || "Something went wrong.");
+          if (result.structuredContent &amp;&amp; typeof result.structuredContent === "object") {
+            return result.structuredContent;
+          }
+          var text = textOf(result);
+          if (text) {
+            try {
+              var parsed = JSON.parse(text);
+              if (parsed &amp;&amp; typeof parsed === "object") return parsed;
+            } catch (e) {
+              return { text: text };
+            }
+          }
+          throw new Error("Tool result had no content.");
+        }
+
+        function callTool(name, args) {
+          return request("tools/call", { name: name, arguments: args }).then(unwrapTool);
+        }
+
+        function esc(value) {
+          return String(value).replace(/[&amp;&lt;&gt;"&#39;]/g, function (ch) {
+            if (ch === "&amp;") return "&amp;amp;";
+            if (ch === "&lt;") return "&amp;lt;";
+            if (ch === "&gt;") return "&amp;gt;";
+            if (ch === &#39;"&#39;) return "&amp;quot;";
+            return "&amp;#39;";
+          });
+        }
+
+        function add(parent, child) {
+          if (child != null &amp;&amp; child !== false) parent.append(child);
+        }
+
+        function h(tag, props) {
+          var node = document.createElement(tag);
+          if (props) {
+            Object.keys(props).forEach(function (key) {
+              var value = props[key];
+              if (value == null || value === false) return;
+              if (key === "class") node.className = value;
+              else if (key === "text") node.textContent = String(value);
+              else if (key.indexOf("on") === 0 &amp;&amp; typeof value === "function") {
+                node.addEventListener(key.slice(2).toLowerCase(), value);
+              } else node.setAttribute(key, value === true ? "" : String(value));
+            });
+          }
+          for (var i = 2; i &lt; arguments.length; i++) {
+            var child = arguments[i];
+            if (child == null || child === false) continue;
+            node.append(child.nodeType ? child : document.createTextNode(String(child)));
+          }
+          return node;
+        }
+
+        function svgNode(markup) {
+          var holder = document.createElement("div");
+          holder.innerHTML = markup.trim();
+          return holder.firstElementChild;
+        }
+
+        function lineColor(line) {
+          var color = line &amp;&amp; line.color;
+          if (color === "success") return "var(--line-success)";
+          if (color === "rust") return "var(--line-rust)";
+          if (color === "span") return "var(--line-span)";
+          if (color === "warning") return "var(--line-warning)";
+          if (color === "primary" || color == null || color === "") return "var(--line-primary)";
+          if (
+            typeof color === "string" &amp;&amp;
+            /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color)
+          ) {
+            return color;
+          }
+          if (typeof color === "string" &amp;&amp; /^[a-z]{1,24}$/i.test(color)) return color;
+          return "var(--line-primary)";
+        }
+
+        function pie(x, y, r, color) {
+          var f = 0.55;
+          var a = -Math.PI / 2 + f * 2 * Math.PI;
+          var ex = (x + r * Math.cos(a)).toFixed(2);
+          var ey = (y + r * Math.sin(a)).toFixed(2);
+          return (
+            &#39;&lt;path d="M&#39; +
+            x +
+            "," +
+            y +
+            " L" +
+            x +
+            "," +
+            (y - r).toFixed(2) +
+            " A" +
+            r +
+            "," +
+            r +
+            " 0 1 1 " +
+            ex +
+            "," +
+            ey +
+            &#39; Z" fill="&#39; +
+            color +
+            &#39;"/&gt;&#39;
+          );
+        }
+
+        function glyph(state, x, y, color, k, selected, title) {
+          var R = 6.5 * k;
+          var body = title ? "&lt;title&gt;" + esc(title) + "&lt;/title&gt;" : "";
+          if (selected) {
+            body +=
+              &#39;&lt;circle cx="&#39; +
+              x +
+              &#39;" cy="&#39; +
+              y +
+              &#39;" r="&#39; +
+              (R + 5.5 * k).toFixed(2) +
+              &#39;" fill="none" stroke="var(--fg)" stroke-width="&#39; +
+              (1.5 * k).toFixed(2) +
+              &#39;"/&gt;&#39;;
+          }
+          if (state === "solid") {
+            body +=
+              &#39;&lt;circle cx="&#39; +
+              x +
+              &#39;" cy="&#39; +
+              y +
+              &#39;" r="&#39; +
+              R.toFixed(2) +
+              &#39;" fill="&#39; +
+              color +
+              &#39;" stroke="var(--card)" stroke-width="&#39; +
+              (2.2 * k).toFixed(2) +
+              &#39;"/&gt;&#39;;
+          } else if (state === "learning") {
+            body +=
+              &#39;&lt;circle cx="&#39; +
+              x +
+              &#39;" cy="&#39; +
+              y +
+              &#39;" r="&#39; +
+              R.toFixed(2) +
+              &#39;" fill="var(--card)" stroke="&#39; +
+              color +
+              &#39;" stroke-width="&#39; +
+              (2.2 * k).toFixed(2) +
+              &#39;"/&gt;&#39; +
+              pie(x, y, R - 2 * k, color);
+          } else if (state === "due") {
+            var d = R + 1.6 * k;
+            body +=
+              &#39;&lt;path d="M&#39; +
+              x +
+              "," +
+              (y - d).toFixed(2) +
+              " L" +
+              (x + d).toFixed(2) +
+              "," +
+              y +
+              " L" +
+              x +
+              "," +
+              (y + d).toFixed(2) +
+              " L" +
+              (x - d).toFixed(2) +
+              "," +
+              y +
+              &#39; Z" fill="var(--due)" stroke="var(--card)" stroke-width="&#39; +
+              (2 * k).toFixed(2) +
+              &#39;" stroke-linejoin="round"/&gt;&#39;;
+          } else {
+            body +=
+              &#39;&lt;circle cx="&#39; +
+              x +
+              &#39;" cy="&#39; +
+              y +
+              &#39;" r="&#39; +
+              R.toFixed(2) +
+              &#39;" fill="var(--card)" stroke="&#39; +
+              color +
+              &#39;" stroke-width="&#39; +
+              (2 * k).toFixed(2) +
+              &#39;" stroke-dasharray="&#39; +
+              (2.4 * k).toFixed(2) +
+              " " +
+              (1.8 * k).toFixed(2) +
+              &#39;"/&gt;&#39;;
+          }
+          return "&lt;g&gt;" + body + "&lt;/g&gt;";
+        }
+
+        function progressSvg(cards, index, done) {
+          var n = cards.length;
+          if (!n) return "";
+          var k = n &gt; 18 ? 0.36 : n &gt; 12 ? 0.46 : 0.58;
+          var y = 10;
+          var pad = 9;
+          var w = 240;
+          function xAt(i) {
+            return n === 1 ? w / 2 : pad + (i * (w - pad * 2)) / (n - 1);
+          }
+          var tracks = "";
+          for (var i = 0; i &lt; n - 1; i++) {
+            var dim = !done &amp;&amp; i &gt;= index ? &#39; opacity="0.28"&#39; : "";
+            tracks +=
+              &#39;&lt;path d="M&#39; +
+              xAt(i).toFixed(1) +
+              "," +
+              y +
+              " H" +
+              xAt(i + 1).toFixed(1) +
+              &#39;" fill="none" stroke="&#39; +
+              lineColor(cards[i].line) +
+              &#39;" stroke-width="&#39; +
+              (3.4 * k).toFixed(2) +
+              &#39;" stroke-linecap="round"&#39; +
+              dim +
+              "/&gt;";
+          }
+          var dots = "";
+          for (var j = 0; j &lt; n; j++) {
+            var state = done || j &lt; index ? "solid" : j === index ? "learning" : "ready";
+            dots += glyph(
+              state,
+              xAt(j),
+              y,
+              lineColor(cards[j].line),
+              k,
+              !done &amp;&amp; j === index,
+              cards[j].conceptTitle,
+            );
+          }
+          return (
+            &#39;&lt;svg viewBox="0 0 &#39; +
+            w +
+            &#39; 20" width="100%" height="20" aria-hidden="true"&gt;&#39; +
+            tracks +
+            dots +
+            "&lt;/svg&gt;"
+          );
+        }
+
+        function shorten(value, max) {
+          var text = String(value || "");
+          return text.length &lt;= max ? text : text.slice(0, max - 1) + "…";
+        }
+
+        function runSvg(stops) {
+          var n = stops.length;
+          if (!n) return "";
+          var gap = n &gt; 10 ? 48 : 56;
+          var pad = 28;
+          var y = 18;
+          var w = pad * 2 + Math.max(0, n - 1) * gap;
+          var h = 78;
+          var tracks = "";
+          for (var i = 0; i &lt; n - 1; i++) {
+            var x1 = pad + i * gap;
+            var x2 = pad + (i + 1) * gap;
+            tracks +=
+              &#39;&lt;path d="M&#39; +
+              x1 +
+              "," +
+              y +
+              " H" +
+              x2 +
+              &#39;" fill="none" stroke="&#39; +
+              lineColor(stops[i].line) +
+              &#39;" stroke-width="5" stroke-linecap="round"/&gt;&#39;;
+          }
+          var marks = "";
+          for (var j = 0; j &lt; n; j++) {
+            var stop = stops[j];
+            var x = pad + j * gap;
+            marks += glyph(
+              stop.state || "ready",
+              x,
+              y,
+              lineColor(stop.line),
+              0.82,
+              false,
+              stop.conceptTitle,
+            );
+            if (stop.state === "due" || stop.note) {
+              var sub = stop.note || (stop.state === "due" ? "Again tomorrow" : "");
+              marks +=
+                &#39;&lt;text class="lbl" x="&#39; +
+                x +
+                &#39;" y="&#39; +
+                (y + 22) +
+                &#39;" text-anchor="middle"&gt;&#39; +
+                esc(shorten(stop.conceptTitle, 14)) +
+                "&lt;/text&gt;";
+              if (sub) {
+                marks +=
+                  &#39;&lt;text class="sub" x="&#39; +
+                  x +
+                  &#39;" y="&#39; +
+                  (y + 34) +
+                  &#39;" text-anchor="middle"&gt;&#39; +
+                  esc(shorten(sub, 18)) +
+                  "&lt;/text&gt;";
+              }
+            }
+          }
+          var names = stops
+            .map(function (stop) {
+              return stop.conceptTitle;
+            })
+            .join(", ");
+          return (
+            &#39;&lt;svg viewBox="0 0 &#39; +
+            w +
+            " " +
+            h +
+            &#39;" width="&#39; +
+            w +
+            &#39;" height="&#39; +
+            h +
+            &#39;" role="img" aria-label="Stops: &#39; +
+            esc(names) +
+            &#39;"&gt;&#39; +
+            tracks +
+            marks +
+            "&lt;/svg&gt;"
+          );
+        }
+
+        function cardIndex() {
+          return payload &amp;&amp; payload.widget === "review" ? position : 0;
+        }
+
+        function currentCard() {
+          if (!payload) return null;
+          if (payload.widget === "check") return payload.card || null;
+          if (payload.widget === "review") return (payload.cards || [])[position] || null;
+          return null;
+        }
+
+        function currentState() {
+          var state = states[cardIndex()];
+          return state &amp;&amp; typeof state === "object" ? state : { status: "open", help: "none" };
+        }
+
+        function syncDraft() {
+          var state = currentState();
+          var answer = state.answer || {};
+          answerBlurred = false;
+          draft = {
+            text: typeof answer.text === "string" ? answer.text : "",
+            choice: typeof answer.choice === "number" ? answer.choice : null,
+            confidence:
+              state.confidence === "low" ||
+              state.confidence === "medium" ||
+              state.confidence === "high"
+                ? state.confidence
+                : null,
+          };
+        }
+
+        function answerReady(card) {
+          if (!card || busy) return false;
+          if (card.kind === "choice") return typeof draft.choice === "number";
+          return draft.text.trim() !== "";
+        }
+
+        function canSubmit(card) {
+          return (
+            answerReady(card) &amp;&amp;
+            (draft.confidence === "low" ||
+              draft.confidence === "medium" ||
+              draft.confidence === "high")
+          );
+        }
+
+        function invoke(name, args, apply) {
+          var exec = function () {
+            busy = true;
+            errorText = null;
+            render();
+            callTool(name, args).then(
+              function (data) {
+                busy = false;
+                apply(data);
+                if (errorText) lastRetry = exec;
+                else lastRetry = null;
+                render();
+              },
+              function (err) {
+                busy = false;
+                errorText = (err &amp;&amp; err.message) || "Request failed.";
+                lastRetry = exec;
+                render();
+              },
+            );
+          };
+          exec();
+        }
+
+        function submit() {
+          var card = currentCard();
+          var state = currentState();
+          if (!payload || !card || state.status === "graded" || !canSubmit(card)) return;
+          var index = cardIndex();
+          var answer = card.kind === "choice" ? { choice: draft.choice } : { text: draft.text };
+          invoke(
+            "learn_widget_answer",
+            {
+              itemId: payload.itemId,
+              cardIndex: index,
+              answer: answer,
+              confidence: draft.confidence,
+              help: state.help === "hint" ? "hint" : "none",
+            },
+            function (next) {
+              states[index] = next;
+            },
+          );
+        }
+
+        function askHint() {
+          var card = currentCard();
+          var state = currentState();
+          if (!payload || !card || !card.hintAvailable || state.status === "graded" || busy) return;
+          var index = cardIndex();
+          invoke(
+            "learn_widget_hint",
+            { itemId: payload.itemId, cardIndex: index },
+            function (data) {
+              var prev =
+                states[index] &amp;&amp; typeof states[index] === "object"
+                  ? states[index]
+                  : { status: "open", help: "none" };
+              var hint = data &amp;&amp; typeof data.hint === "string" ? data.hint : "";
+              states[index] = {
+                status: prev.status || "open",
+                help: "hint",
+                hint: hint,
+                answer: prev.answer,
+                confidence: prev.confidence,
+                result: prev.result,
+              };
+            },
+          );
+        }
+
+        function reveal() {
+          if (!payload || currentState().status === "graded" || busy) return;
+          var index = cardIndex();
+          invoke(
+            "learn_widget_reveal",
+            { itemId: payload.itemId, cardIndex: index },
+            function (next) {
+              states[index] = next;
+            },
+          );
+        }
+
+        function override(rating) {
+          var state = currentState();
+          if (!payload || !state.result || state.result.rating === rating || busy) return;
+          var index = cardIndex();
+          invoke(
+            "learn_widget_override",
+            { itemId: payload.itemId, cardIndex: index, rating: rating },
+            function (next) {
+              states[index] = next;
+            },
+          );
+        }
+
+        function nextCard() {
+          if (!payload || payload.widget !== "review" || finished) return;
+          var cards = payload.cards || [];
+          if (position &gt;= cards.length - 1) {
+            finished = true;
+            render();
+            return;
+          }
+          position += 1;
+          syncDraft();
+          render();
+        }
+
+        function act(action, conceptId) {
+          if (!payload || busy) return;
+          var args = { itemId: payload.itemId, action: action };
+          if (conceptId) args.conceptId = conceptId;
+          invoke("learn_widget_action", args, function (data) {
+            if (!data || data.ok === false) {
+              errorText = (data &amp;&amp; data.message) || "That did not work.";
+              return;
+            }
+            doneAction = action;
+            notice = data.message || (action === "snooze" ? "Snoozed." : "Started.");
+          });
+        }
+
+        function remembered() {
+          var cards = (payload &amp;&amp; payload.cards) || [];
+          var count = 0;
+          for (var i = 0; i &lt; cards.length; i++) {
+            var result = states[i] &amp;&amp; states[i].result;
+            if (result &amp;&amp; result.rating &amp;&amp; result.rating !== "again") count += 1;
+          }
+          return count;
+        }
+
+        function chip(card) {
+          var name = card.conceptTitle || (card.line &amp;&amp; card.line.name) || "Concept";
+          var swatch = h("i");
+          swatch.style.background = lineColor(card.line);
+          return h("span", { class: "line", title: name }, swatch, name);
+        }
+
+        function errorBox() {
+          if (!errorText) return null;
+          return h(
+            "div",
+            { class: "err", role: "alert" },
+            h("span", { text: errorText }),
+            lastRetry
+              ? h("button", {
+                  class: "quiet",
+                  type: "button",
+                  "data-k": "retry",
+                  onClick: function () {
+                    lastRetry();
+                  },
+                  text: "Retry",
+                })
+              : null,
+          );
+        }
+
+        function answerControl(card, open) {
+          if (!open) return null;
+          if (card.kind === "choice") {
+            var options = card.options || [];
+            var group = h("div", { class: "opts", role: "radiogroup", "aria-label": "Answer" });
+            options.forEach(function (option, index) {
+              group.append(
+                h(
+                  "button",
+                  {
+                    class: "opt",
+                    type: "button",
+                    role: "radio",
+                    "aria-checked": draft.choice === index ? "true" : "false",
+                    "data-k": "opt-" + index,
+                    disabled: busy,
+                    onClick: function () {
+                      draft.choice = index;
+                      render();
+                    },
+                  },
+                  index &lt; 9 ? h("kbd", { text: String(index + 1) }) : null,
+                  h("span", { text: option }),
+                ),
+              );
+            });
+            return group;
+          }
+          if (
+            card.kind === "cloze" &amp;&amp;
+            card.stem.indexOf("____") !== -1 &amp;&amp;
+            card.stem.split("____").length === 2
+          ) {
+            return null;
+          }
+          if (card.kind === "cloze") {
+            return h(
+              "label",
+              { class: "lbl", text: "Fill the blank" },
+              h("input", {
+                class: "field",
+                type: "text",
+                "data-k": "answer",
+                autocomplete: "off",
+                value: draft.text,
+                disabled: busy,
+                onInput: onText,
+              }),
+            );
+          }
+          var area = h("textarea", {
+            class: "area",
+            "data-k": "answer",
+            rows: "2",
+            disabled: busy,
+            onInput: onArea,
+          });
+          area.value = draft.text;
+          area.setAttribute("aria-label", card.kind === "recall" ? "Recall" : "Answer");
+          requestAnimationFrame(function () {
+            grow(area);
+          });
+          return h(
+            "label",
+            { class: "lbl", text: card.kind === "recall" ? "Recall" : "Answer" },
+            area,
+          );
+        }
+
+        function onText(event) {
+          draft.text = event.target.value;
+          if (event.target.classList.contains("blank")) sizeBlank(event.target);
+          var button = document.querySelector("[data-k=submit]");
+          var card = currentCard();
+          if (button &amp;&amp; card) button.disabled = !canSubmit(card);
+        }
+
+        function onArea(event) {
+          draft.text = event.target.value;
+          grow(event.target);
+          var button = document.querySelector("[data-k=submit]");
+          var card = currentCard();
+          if (button &amp;&amp; card) button.disabled = !canSubmit(card);
+        }
+
+        function grow(area) {
+          area.style.height = "auto";
+          area.style.height = area.scrollHeight + "px";
+        }
+
+        function sizeBlank(input) {
+          var chars = Math.max(6, Math.min(28, input.value.length + 1));
+          input.style.width = chars + "ch";
+        }
+
+        function stemNode(card, open) {
+          var parts = card.kind === "cloze" ? String(card.stem || "").split("____") : null;
+          if (open &amp;&amp; parts &amp;&amp; parts.length === 2) {
+            var input = h("input", {
+              class: "blank",
+              type: "text",
+              "data-k": "answer",
+              "aria-label": "Missing word",
+              autocomplete: "off",
+              value: draft.text,
+              disabled: busy,
+              onInput: onText,
+            });
+            sizeBlank(input);
+            return h("p", { class: "stem" }, parts[0], input, parts[1]);
+          }
+          return h("p", { class: "stem", text: card.stem || "" });
+        }
+
+        function yours(card, state) {
+          var answer = state.answer || {};
+          var text = typeof answer.text === "string" ? answer.text.trim() : "";
+          if (!text &amp;&amp; typeof answer.choice === "number" &amp;&amp; card.options)
+            text = card.options[answer.choice] || "";
+          if (!text) return null;
+          return h("p", { class: "yours", text: "You answered: " + text });
+        }
+
+        function resultBlock(card, state) {
+          var result = state.result;
+          if (!result) return null;
+          var block = h("div", { class: "result" });
+          var outcome =
+            result.outcome === "correct" ||
+            result.outcome === "partial" ||
+            result.outcome === "incorrect"
+              ? result.outcome
+              : "partial";
+          var label =
+            outcome === "correct" ? "Correct" : outcome === "partial" ? "Partial" : "Incorrect";
+          block.append(h("p", { class: "outcome " + outcome, text: label }));
+          if (result.feedback) block.append(h("p", { text: result.feedback }));
+          if (result.explanation) block.append(h("p", { text: result.explanation }));
+          if (result.correctAnswer) {
+            block.append(
+              h("p", { class: "answer" }, h("b", { text: "Answer. " }), result.correctAnswer),
+            );
+          }
+          if (result.hypercorrection) {
+            var mix =
+              card.misconceptionWarning || "You were sure, and this answer missed the mark.";
+            block.append(
+              h(
+                "div",
+                { class: "note" },
+                h("span", {}, h("b", { text: "Watch this mix-up. " }), mix),
+              ),
+            );
+          }
+          var grades = h("div", { class: "grades", role: "group", "aria-label": "Grade" });
+          RATINGS.forEach(function (rating, index) {
+            var on = result.rating === rating;
+            grades.append(
+              h(
+                "button",
+                {
+                  class: "grade" + (rating === "again" ? " again" : "") + (on ? " on" : ""),
+                  type: "button",
+                  "data-k": "grade-" + rating,
+                  "aria-pressed": on ? "true" : "false",
+                  disabled: busy,
+                  onClick: function () {
+                    override(rating);
+                  },
+                },
+                h("span", { class: "name", text: RATING_LABEL[rating] }),
+                h("small", { text: (result.intervals &amp;&amp; result.intervals[rating]) || "" }),
+                h("kbd", { text: String(index + 1) }),
+              ),
+            );
+          });
+          block.append(grades);
+          block.append(
+            h("p", {
+              class: "grade-note",
+              text: "Graded from your answer and confidence. Tap to change.",
+            }),
+          );
+          return block;
+        }
+
+        function cardView() {
+          var card = currentCard();
+          var state = currentState();
+          if (!card) return h("div", { class: "card", text: "This card is missing." });
+          var open = state.status !== "graded";
+          var root = h("div", { class: "card enter" });
+          var head = h("div", { class: "head" });
+          if (payload.widget === "review") {
+            var cards = payload.cards || [];
+            var progress = h("div", { class: "progress" });
+            var graphic = svgNode(progressSvg(cards, position, false));
+            if (graphic) progress.append(graphic);
+            head.append(progress);
+            head.append(
+              h("span", { class: "count", text: "Card " + (position + 1) + " of " + cards.length }),
+            );
+          }
+          head.append(chip(card));
+          if (payload.widget === "check") {
+            head.append(h("span", { class: "count", text: "Card 1 of 1" }));
+          }
+          root.append(head);
+          root.append(stemNode(card, open));
+          add(root, answerControl(card, open));
+          if (open &amp;&amp; card.misconceptionWarning) {
+            root.append(h("div", { class: "warn", text: card.misconceptionWarning }));
+          }
+          if (open &amp;&amp; state.help === "hint" &amp;&amp; state.hint) {
+            root.append(h("div", { class: "hint", text: state.hint }));
+          }
+          if (open) {
+            var conf = h("div", { class: "conf", role: "radiogroup", "aria-label": "Confidence" });
+            CONF.forEach(function (item) {
+              conf.append(
+                h("button", {
+                  type: "button",
+                  role: "radio",
+                  "aria-checked": draft.confidence === item.id ? "true" : "false",
+                  "data-k": "conf-" + item.id,
+                  disabled: busy,
+                  onClick: function () {
+                    draft.confidence = item.id;
+                    render();
+                  },
+                  text: item.label,
+                }),
+              );
+            });
+            root.append(h("div", { class: "lbl", text: "How sure are you?" }));
+            root.append(conf);
+            var actions = h("div", { class: "actions" });
+            if (card.hintAvailable &amp;&amp; state.help !== "hint") {
+              actions.append(
+                h("button", {
+                  class: "btn",
+                  type: "button",
+                  "data-k": "hint",
+                  disabled: busy,
+                  onClick: askHint,
+                  text: "Hint",
+                }),
+              );
+            }
+            actions.append(
+              h("button", {
+                class: "quiet",
+                type: "button",
+                "data-k": "reveal",
+                disabled: busy,
+                onClick: reveal,
+                text: "Show answer",
+              }),
+            );
+            actions.append(
+              h("button", {
+                class: "btn primary",
+                type: "button",
+                "data-k": "submit",
+                disabled: !canSubmit(card),
+                onClick: submit,
+                text: "Submit",
+              }),
+            );
+            root.append(actions);
+            root.append(
+              h("p", { class: "hints", text: "Enter submits. Alt+1 to 3 sets confidence." }),
+            );
+          } else {
+            add(root, yours(card, state));
+            add(root, resultBlock(card, state));
+            if (payload.widget === "review") {
+              root.append(
+                h(
+                  "div",
+                  { class: "actions" },
+                  h("button", {
+                    class: "btn primary next",
+                    type: "button",
+                    "data-k": "next",
+                    disabled: busy,
+                    onClick: nextCard,
+                    text: "Next card",
+                  }),
+                ),
+              );
+              root.append(
+                h("p", {
+                  class: "hints",
+                  text: "Space shows the next card. 1 to 4 changes the grade.",
+                }),
+              );
+            } else {
+              root.append(h("p", { class: "hints", text: "1 to 4 changes the grade." }));
+            }
+          }
+          add(root, errorBox());
+          return root;
+        }
+
+        function doneView() {
+          var cards = (payload &amp;&amp; payload.cards) || [];
+          var count = remembered();
+          var root = h("div", { class: "card done enter" });
+          var progress = h("div", { class: "progress" });
+          var graphic = svgNode(progressSvg(cards, cards.length - 1, true));
+          if (graphic) progress.append(graphic);
+          root.append(
+            h(
+              "div",
+              { class: "head" },
+              progress,
+              h("span", { class: "count", text: "Card " + cards.length + " of " + cards.length }),
+            ),
+          );
+          root.append(h("h1", { text: "Review done, " + count + " remembered" }));
+          add(root, errorBox());
+          return root;
+        }
+
+        function sessionView(summary) {
+          var root = h("div", { class: "card end enter" });
+          if (!summary) {
+            root.append(h("p", { text: "This session has no summary." }));
+            add(root, errorBox());
+            return root;
+          }
+          var counts = summary.counts || {};
+          root.append(h("h1", { text: summary.title || "Review done" }));
+          root.append(
+            h("p", {
+              class: "sub",
+              text:
+                (counts.remembered || 0) +
+                " remembered, " +
+                (counts.again || 0) +
+                " again · " +
+                (typeof summary.minutes === "number" ? summary.minutes : 0) +
+                " min",
+            }),
+          );
+          var stops = summary.stops || [];
+          if (stops.length) {
+            var run = h("div", { class: "run" });
+            var graphic = svgNode(runSvg(stops));
+            if (graphic) run.append(graphic);
+            root.append(run);
+          }
+          var diff = summary.diff || [];
+          if (diff.length) {
+            var box = h("div", { class: "diff" });
+            box.append(h("div", { class: "diff-h", text: "Understanding" }));
+            diff.forEach(function (row) {
+              var mark = DIFF[row.kind];
+              if (!mark) return;
+              var text = h("span", {}, row.conceptTitle || "");
+              if (row.detail) text.append(h("em", { text: row.detail }));
+              box.append(h("div", { class: "diff-row " + row.kind }, h("b", { text: mark }), text));
+            });
+            root.append(box);
+          }
+          var schedule = summary.schedule || [];
+          if (schedule.length) {
+            var list = h("dl", { class: "sched" });
+            schedule.forEach(function (row) {
+              list.append(h("dt", { text: row.when || "" }));
+              list.append(h("dd", { text: (row.concepts || []).join(", ") }));
+            });
+            root.append(list);
+          }
+          if (summary.unlocked &amp;&amp; summary.unlocked.conceptTitle) {
+            root.append(
+              h(
+                "div",
+                { class: "unlocked" },
+                svgNode(
+                  &#39;&lt;svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"&gt;&#39; +
+                    glyph("ready", 8, 8, lineColor(null), 0.72, false) +
+                    "&lt;/svg&gt;",
+                ),
+                h(
+                  "span",
+                  {},
+                  h("b", { text: summary.unlocked.conceptTitle }),
+                  " is ready to learn.",
+                ),
+              ),
+            );
+          }
+          var actions = h("div", { class: "actions" });
+          if (summary.next &amp;&amp; summary.next.conceptTitle) {
+            actions.append(
+              h("button", {
+                class: "btn primary",
+                type: "button",
+                disabled: busy || doneAction === "start_concept",
+                onClick: function () {
+                  act("start_concept", summary.next.conceptId);
+                },
+                text: "Learn " + summary.next.conceptTitle,
+              }),
+            );
+          }
+          if (summary.snoozeUntil) {
+            actions.append(
+              h("button", {
+                class: "btn",
+                type: "button",
+                disabled: busy || doneAction === "snooze",
+                onClick: function () {
+                  act("snooze");
+                },
+                text: "Snooze until " + summary.snoozeUntil,
+              }),
+            );
+          }
+          if (actions.childNodes.length) root.append(actions);
+          if (notice) root.append(h("div", { class: "notice", text: notice }));
+          add(root, errorBox());
+          return root;
+        }
+
+        function announcement() {
+          if (errorText) return errorText;
+          if (notice) return notice;
+          if (finished &amp;&amp; payload &amp;&amp; payload.widget === "review") {
+            return "Review done, " + remembered() + " remembered";
+          }
+          var state = currentState();
+          if (state.status === "graded" &amp;&amp; state.result) {
+            var outcome = state.result.outcome || "graded";
+            return outcome + ". " + (state.result.feedback || "");
+          }
+          if (state.help === "hint" &amp;&amp; state.hint) return "Hint. " + state.hint;
+          return "";
+        }
+
+        function captureFocus() {
+          var el = document.activeElement;
+          if (!el || !el.getAttribute) return null;
+          var key = el.getAttribute("data-k");
+          if (!key) return null;
+          return { key: key, start: el.selectionStart, end: el.selectionEnd };
+        }
+
+        function restoreFocus(saved) {
+          if (!saved) return;
+          var safe = window.CSS &amp;&amp; CSS.escape ? CSS.escape(saved.key) : saved.key.replace(/"/g, "");
+          var el = document.querySelector(&#39;[data-k="&#39; + safe + &#39;"]&#39;);
+          if (!el || !el.focus) return;
+          el.focus();
+          if (typeof saved.start === "number" &amp;&amp; el.setSelectionRange) {
+            try {
+              el.setSelectionRange(saved.start, saved.end);
+            } catch (e) {
+              /* caret may not apply */
+            }
+          }
+        }
+
+        function render() {
+          var saved = captureFocus();
+          var node = !payload
+            ? h("div", { class: "card wait", text: "Waiting for the card…" })
+            : payload.widget === "session-end"
+              ? sessionView(payload.summary)
+              : payload.widget === "review" &amp;&amp; finished
+                ? doneView()
+                : cardView();
+          document.getElementById("app").replaceChildren(node);
+          restoreFocus(saved);
+          var text = announcement();
+          var live = document.getElementById("live");
+          if (live &amp;&amp; text !== lastLive) {
+            lastLive = text;
+            live.textContent = text;
+          }
+          reportSoon();
+        }
+
+        function isField(target) {
+          if (!target || !target.tagName) return false;
+          var tag = target.tagName;
+          return tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable;
+        }
+
+        function inChoices(target) {
+          return !!(target &amp;&amp; target.closest &amp;&amp; target.closest(".opts"));
+        }
+
+        document.addEventListener("focusout", function (event) {
+          var from = event.target;
+          if (!from || !from.closest || !from.closest(".opts, .blank, .field, .area")) return;
+          var next = event.relatedTarget;
+          if (next &amp;&amp; next.closest &amp;&amp; next.closest(".opts, .blank, .field, .area")) return;
+          answerBlurred = true;
+        });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.metaKey || event.ctrlKey || event.isComposing) return;
+          var card = currentCard();
+          var state = currentState();
+          var graded = state.status === "graded";
+          if (event.altKey &amp;&amp; (event.key === "1" || event.key === "2" || event.key === "3")) {
+            if (!card || graded) return;
+            event.preventDefault();
+            draft.confidence = CONF[Number(event.key) - 1].id;
+            render();
+            return;
+          }
+          if (event.key === "Enter" &amp;&amp; !event.shiftKey &amp;&amp; card &amp;&amp; !graded) {
+            if (event.target &amp;&amp; event.target.tagName === "BUTTON") return;
+            event.preventDefault();
+            if (canSubmit(card)) submit();
+            return;
+          }
+          if (
+            event.key === " " &amp;&amp;
+            payload &amp;&amp;
+            payload.widget === "review" &amp;&amp;
+            graded &amp;&amp;
+            !finished &amp;&amp;
+            !isField(event.target)
+          ) {
+            if (event.target &amp;&amp; event.target.tagName === "BUTTON") return;
+            event.preventDefault();
+            nextCard();
+            return;
+          }
+          if (!card || busy) return;
+          if (
+            !graded &amp;&amp;
+            !answerBlurred &amp;&amp;
+            card.kind === "choice" &amp;&amp;
+            !isField(event.target) &amp;&amp;
+            /^[1-9]$/.test(event.key)
+          ) {
+            var index = Number(event.key) - 1;
+            if (card.options &amp;&amp; index &lt; card.options.length) {
+              event.preventDefault();
+              draft.choice = index;
+              render();
+            }
+            return;
+          }
+          if (
+            !graded &amp;&amp;
+            answerBlurred &amp;&amp;
+            !isField(event.target) &amp;&amp;
+            !inChoices(event.target) &amp;&amp;
+            /^[1-3]$/.test(event.key)
+          ) {
+            event.preventDefault();
+            draft.confidence = CONF[Number(event.key) - 1].id;
+            render();
+            return;
+          }
+          if (graded &amp;&amp; !isField(event.target) &amp;&amp; /^[1-4]$/.test(event.key)) {
+            event.preventDefault();
+            override(RATINGS[Number(event.key) - 1]);
+          }
+        });
+
+        function applyVariables(variables) {
+          var root = document.documentElement;
+          var next = [];
+          var seen = {};
+          var source = variables &amp;&amp; typeof variables === "object" ? variables : {};
+          Object.keys(source).forEach(function (key) {
+            if (!/^--[a-zA-Z0-9-]+$/.test(key)) return;
+            root.style.setProperty(key, String(source[key]).replace(/[;{}&lt;&gt;]/g, ""));
+            seen[key] = true;
+            next.push(key);
+          });
+          appliedVars.forEach(function (key) {
+            if (!seen[key]) root.style.removeProperty(key);
+          });
+          appliedVars = next;
+        }
+
+        function applyContext(partial) {
+          if (!partial || typeof partial !== "object") return;
+          if (partial.theme === "light" || partial.theme === "dark") {
+            document.documentElement.dataset.theme = partial.theme;
+          }
+          if (partial.styles &amp;&amp; typeof partial.styles === "object")
+            applyVariables(partial.styles.variables || {});
+          if (partial.containerDimensions &amp;&amp; typeof partial.containerDimensions === "object") {
+            var box = partial.containerDimensions;
+            var cap =
+              typeof box.height === "number"
+                ? box.height
+                : typeof box.maxHeight === "number"
+                  ? box.maxHeight
+                  : 0;
+            var root = document.documentElement;
+            if (cap &gt; 0) {
+              root.style.maxHeight = Math.round(cap) + "px";
+              root.style.overflow = "auto";
+            } else {
+              root.style.removeProperty("max-height");
+              root.style.removeProperty("overflow");
+            }
+          }
+          reportSoon();
+        }
+
+        function capLimit() {
+          var raw = parseFloat(document.documentElement.style.maxHeight);
+          return Number.isFinite(raw) &amp;&amp; raw &gt; 0 ? raw : Infinity;
+        }
+
+        function reportSize() {
+          var root = document.documentElement;
+          var content = Math.ceil(
+            Math.max(root.scrollHeight, document.body ? document.body.scrollHeight : 0),
+          );
+          var height = Math.max(32, Math.min(content, capLimit()));
+          var width = Math.ceil(root.clientWidth || 0);
+          if (height === lastH &amp;&amp; width === lastW) return;
+          lastH = height;
+          lastW = width;
+          notify("ui/notifications/size-changed", { width: width, height: height });
+        }
+
+        function reportSoon() {
+          if (sizeQueued) return;
+          sizeQueued = true;
+          requestAnimationFrame(function () {
+            sizeQueued = false;
+            reportSize();
+          });
+        }
+
+        function acceptPayload(data) {
+          if (
+            !data ||
+            (data.widget !== "check" &amp;&amp; data.widget !== "review" &amp;&amp; data.widget !== "session-end")
+          )
+            return;
+          if (typeof data.itemId !== "string" || data.itemId === "") return;
+          var itemId = data.itemId;
+          payload = data;
+          states = [];
+          position = 0;
+          finished = false;
+          draft = { text: "", choice: null, confidence: null };
+          errorText = null;
+          lastRetry = null;
+          notice = null;
+          doneAction = null;
+          render();
+          invoke("learn_widget_state", { itemId: itemId }, function (state) {
+            if (!payload || payload.itemId !== itemId) return;
+            states = Array.isArray(state.states) ? state.states : [];
+            position =
+              typeof state.position === "number" &amp;&amp; state.position &gt;= 0
+                ? Math.floor(state.position)
+                : 0;
+            if (payload.widget === "review") {
+              var cards = payload.cards || [];
+              var n = cards.length;
+              if (
+                n &gt; 0 &amp;&amp;
+                states.slice(0, n).length === n &amp;&amp;
+                states.slice(0, n).every(function (entry) {
+                  return entry &amp;&amp; entry.status === "graded";
+                })
+              ) {
+                finished = true;
+                position = n - 1;
+              } else if (n &gt; 0 &amp;&amp; position &gt;= n) position = n - 1;
+            }
+            syncDraft();
+          });
+        }
+
+        window.addEventListener("message", function (event) {
+          var data = event.data;
+          if (!data || typeof data !== "object" || data.jsonrpc !== "2.0") return;
+          if (typeof data.method === "string") {
+            var params = data.params &amp;&amp; typeof data.params === "object" ? data.params : {};
+            if (data.id != null) {
+              if (data.method === "ping" || data.method === "ui/resource-teardown") {
+                post({ jsonrpc: "2.0", id: data.id, result: {} });
+              }
+              return;
+            }
+            if (data.method === "ui/notifications/tool-input") return;
+            if (data.method === "ui/notifications/host-context-changed") {
+              applyContext(params);
+              return;
+            }
+            if (data.method === "ui/notifications/tool-result") {
+              try {
+                acceptPayload(unwrapTool(params));
+              } catch (e) {
+                /* ignore a failed delivery */
+              }
+            }
+            return;
+          }
+          if (data.id != null &amp;&amp; pending.has(data.id)) {
+            var waiter = pending.get(data.id);
+            pending.delete(data.id);
+            if (data.error)
+              waiter.reject(new Error((data.error &amp;&amp; data.error.message) || "Request failed."));
+            else waiter.resolve(data.result);
+          }
+        });
+
+        if (typeof ResizeObserver === "function") {
+          var observer = new ResizeObserver(function () {
+            reportSize();
+          });
+          observer.observe(document.documentElement);
+          if (document.body) observer.observe(document.body);
+        }
+
+        request("ui/initialize", {
+          protocolVersion: PROTOCOL,
+          appInfo: { name: "learn-widget", version: "1" },
+          appCapabilities: { availableDisplayModes: ["inline", "fullscreen"] },
+        }).then(
+          function (result) {
+            if (result &amp;&amp; result.hostContext) applyContext(result.hostContext);
+            notify("ui/notifications/initialized", {});
+          },
+          function () {
+            errorText = "The host did not initialize.";
+            render();
+          },
+        );
+      })();
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+'
+        ></iframe>
+        <div class="foot">
+          <span id="hint"></span>
+          <span class="trace" id="trace"></span>
+        </div>
+      </section>
+    </main>
+    <script>
+      (function () {
+        var PROTOCOL = "2026-01-26";
+        var prob = { id: "prob", name: "Probability", color: "primary" };
+        var eff = { id: "eff", name: "Effect", color: "success" };
+        var span = { id: "span", name: "Spanish", color: "span" };
+
+        var checkCard = {
+          conceptId: "likelihood",
+          conceptTitle: "Likelihood",
+          line: prob,
+          kind: "choice",
+          stem: "A test flags 99% of people who have the disease. Which quantity is that 99%?",
+          options: [
+            "The likelihood of the data given a fixed θ",
+            "The posterior",
+            "The prior",
+            "The evidence",
+          ],
+          hintAvailable: true,
+          misconceptionWarning: "This is not the chance the disease is present.",
+        };
+
+        var payloads = {
+          check: { widget: "check", itemId: "check-likelihood", card: checkCard },
+          review: {
+            widget: "review",
+            itemId: "review-probability",
+            title: "Probability review",
+            cards: [
+              {
+                conceptId: "likelihood",
+                conceptTitle: "Likelihood",
+                line: prob,
+                kind: "cloze",
+                stem: "The likelihood L(θ) scores each θ against ____ data.",
+                hintAvailable: true,
+                misconceptionWarning: "It is not the probability that θ is true.",
+              },
+              checkCard,
+              {
+                conceptId: "priors",
+                conceptTitle: "Priors",
+                line: prob,
+                kind: "short",
+                stem: "In one sentence, what does a prior say before any data arrives?",
+                hintAvailable: true,
+              },
+              {
+                conceptId: "bayes",
+                conceptTitle: "Bayes' rule",
+                line: prob,
+                kind: "recall",
+                stem: "Write what Bayes' rule balances, in words.",
+                hintAvailable: false,
+              },
+              {
+                conceptId: "expectation",
+                conceptTitle: "Expectation",
+                line: prob,
+                kind: "choice",
+                stem: "Which description of expectation is right?",
+                options: [
+                  "The average of the values, with the distribution held fixed",
+                  "The most likely single outcome",
+                  "The midpoint of the range",
+                  "The largest value you observed",
+                ],
+                hintAvailable: false,
+              },
+              {
+                conceptId: "schema",
+                conceptTitle: "Schema",
+                line: eff,
+                kind: "short",
+                stem: "What does a schema decide before a value enters the program?",
+                hintAvailable: true,
+              },
+            ],
+          },
+          "session-end": {
+            widget: "session-end",
+            itemId: "session-probability",
+            summary: {
+              title: "Review done",
+              minutes: 9,
+              counts: { reviewed: 12, remembered: 10, again: 2 },
+              diff: [
+                {
+                  kind: "fixed",
+                  conceptTitle: "P(data | θ) is the chance θ is true",
+                  detail: "Misconception fixed",
+                },
+                {
+                  kind: "learned",
+                  conceptTitle: "L(θ) scores θ against fixed data",
+                  detail: "Learned",
+                },
+                {
+                  kind: "learned",
+                  conceptTitle: "posterior ∝ likelihood × prior",
+                  detail: "Recall 62%",
+                },
+                {
+                  kind: "stronger",
+                  conceptTitle: "Conditional probability",
+                  detail: "Recall 71% to 88%",
+                },
+                { kind: "weaker", conceptTitle: "Random variables", detail: "Recall slipped" },
+              ],
+              stops: [
+                { conceptTitle: "Probability", state: "solid", line: prob },
+                { conceptTitle: "Conditional probability", state: "solid", line: prob },
+                { conceptTitle: "Random variables", state: "solid", line: prob },
+                { conceptTitle: "Likelihood", state: "due", line: prob },
+                { conceptTitle: "Expectation", state: "solid", line: prob },
+                { conceptTitle: "Bayes' rule", state: "solid", line: prob },
+                { conceptTitle: "Priors", state: "due", line: prob, note: "Again tomorrow" },
+                { conceptTitle: "Layers", state: "solid", line: eff },
+                { conceptTitle: "Services", state: "solid", line: eff },
+                { conceptTitle: "Schema", state: "learning", line: eff },
+                { conceptTitle: "Effect.gen", state: "solid", line: eff },
+                { conceptTitle: "Present tense", state: "ready", line: span },
+              ],
+              schedule: [
+                { when: "Tomorrow", concepts: ["Likelihood", "Priors"] },
+                {
+                  when: "Thu 12 Nov",
+                  concepts: ["Schema", "Services", "Expectation", "Random variables"],
+                },
+                { when: "In 2 to 3 weeks", concepts: ["6 concepts"] },
+              ],
+              unlocked: { conceptId: "conjugate", conceptTitle: "Conjugate priors" },
+              next: { conceptId: "conjugate", conceptTitle: "Conjugate priors" },
+              snoozeUntil: "tomorrow, 9:00",
+            },
+          },
+        };
+
+        var leads = {
+          check: "<b>Check 2 of 3.</b> Likelihood, inside the lesson.",
+          review: "<b>Woke from snooze.</b> Six concepts due on Probability and Effect.",
+          "session-end": "<b>Reviewed 12 cards</b> in 9 minutes.",
+        };
+
+        var kind = "review";
+        var theme = "dark";
+        var phone = false;
+        var booted = false;
+        var store = {};
+        var frame = document.getElementById("frame");
+        var generation = 0;
+
+        function variables() {
+          if (theme === "light") {
+            return {
+              "--color-background-primary": "#f6f6f7",
+              "--color-background-secondary": "#ffffff",
+              "--color-background-tertiary": "#f0f0f2",
+              "--color-text-primary": "#18181b",
+              "--color-text-secondary": "#71717a",
+              "--color-text-danger": "#dc2626",
+              "--color-text-success": "#15803d",
+              "--color-text-warning": "#b45309",
+              "--color-text-info": "#1d4ed8",
+              "--color-border-primary": "#e4e4e7",
+              "--color-border-secondary": "#d4d4d8",
+              "--color-border-danger": "#ef4444",
+              "--color-background-danger": "rgba(220, 38, 38, 0.08)",
+              "--color-background-warning": "rgba(217, 119, 6, 0.12)",
+              "--color-ring-primary": "#4f46e5",
+              "--font-sans": "ui-sans-serif, system-ui, sans-serif",
+              "--font-mono": "ui-monospace, SFMono-Regular, Menlo, monospace",
+              "--border-radius-md": "10px",
+              "--t3-primary": "#4f46e5",
+              "--t3-primary-foreground": "#ffffff",
+            };
+          }
+          return {
+            "--color-background-primary": "#09090b",
+            "--color-background-secondary": "#16161a",
+            "--color-background-tertiary": "#222228",
+            "--color-text-primary": "#f4f4f5",
+            "--color-text-secondary": "#a1a1aa",
+            "--color-text-danger": "#fca5a5",
+            "--color-text-success": "#86efac",
+            "--color-text-warning": "#fcd34d",
+            "--color-text-info": "#93c5fd",
+            "--color-border-primary": "rgba(255, 255, 255, 0.1)",
+            "--color-border-secondary": "rgba(255, 255, 255, 0.16)",
+            "--color-border-danger": "#f87171",
+            "--color-background-danger": "rgba(248, 113, 113, 0.14)",
+            "--color-background-warning": "rgba(251, 191, 36, 0.14)",
+            "--color-ring-primary": "#818cf8",
+            "--font-sans": "ui-sans-serif, system-ui, sans-serif",
+            "--font-mono": "ui-monospace, SFMono-Regular, Menlo, monospace",
+            "--border-radius-md": "10px",
+            "--t3-primary": "#818cf8",
+            "--t3-primary-foreground": "#0b1020",
+          };
+        }
+
+        function dimensions() {
+          return phone ? { width: 360, maxHeight: 420 } : { width: 640, maxHeight: 900 };
+        }
+
+        function context() {
+          return {
+            theme: theme,
+            styles: { variables: variables() },
+            displayMode: "inline",
+            availableDisplayModes: ["inline", "fullscreen"],
+            containerDimensions: dimensions(),
+            platform: phone ? "mobile" : "web",
+            locale: "en",
+          };
+        }
+
+        function send(message) {
+          if (frame.contentWindow) frame.contentWindow.postMessage(message, "*");
+        }
+
+        function payload() {
+          return payloads[kind];
+        }
+
+        function cardCount(body) {
+          if (body.widget === "check") return 1;
+          if (body.widget === "review") return body.cards.length;
+          return 0;
+        }
+
+        function cardAt(body, index) {
+          if (body.widget === "check") return index === 0 ? body.card : null;
+          if (body.widget === "review") return body.cards[index] || null;
+          return null;
+        }
+
+        function bucket(itemId, count) {
+          if (!store[itemId]) store[itemId] = { states: [], position: 0 };
+          var row = store[itemId];
+          while (row.states.length < count) row.states.push({ status: "open", help: "none" });
+          return row;
+        }
+
+        function ok(data) {
+          return {
+            content: [{ type: "text", text: JSON.stringify(data) }],
+            structuredContent: data,
+          };
+        }
+
+        function fail(message) {
+          return { content: [{ type: "text", text: message }], isError: true };
+        }
+
+        function intervals() {
+          return { again: "in 1 min", hard: "in 8 min", good: "in 3 days", easy: "in 9 days" };
+        }
+
+        function grade(args, card, help) {
+          var answer = args.answer || {};
+          var blob =
+            typeof answer.choice === "number" && card.options
+              ? String(card.options[answer.choice] || "")
+              : String(answer.text || "");
+          var correct = blob.toLowerCase().indexOf("fixed") !== -1;
+          var outcome = help === "answer" ? "incorrect" : correct ? "correct" : "partial";
+          var confidence =
+            args.confidence === "high" || args.confidence === "medium" || args.confidence === "low"
+              ? args.confidence
+              : "low";
+          var rating = "again";
+          if (help !== "answer" && outcome === "correct" && confidence === "high") rating = "easy";
+          else if (help !== "answer" && outcome === "correct" && confidence === "medium")
+            rating = "good";
+          else if (help !== "answer" && outcome === "correct") rating = "hard";
+          else if (help !== "answer" && confidence === "high") rating = "hard";
+          var right = "How expected the data is when θ is held fixed.";
+          if (card.options) {
+            card.options.forEach(function (option) {
+              if (String(option).toLowerCase().indexOf("fixed") !== -1) right = option;
+            });
+          }
+          var result = {
+            outcome: outcome,
+            rating: rating,
+            hypercorrection: help !== "answer" && outcome !== "correct" && confidence === "high",
+            feedback:
+              help === "answer"
+                ? "Shown. This one comes back soon."
+                : outcome === "correct"
+                  ? "That holds the data fixed and lets θ vary."
+                  : "Part of it. The likelihood scores θ against data held fixed.",
+            explanation: "L(θ) = P(data | θ). It is not a probability distribution over θ.",
+            intervals: intervals(),
+          };
+          if (!(outcome === "correct" && help !== "answer")) result.correctAnswer = right;
+          return {
+            status: "graded",
+            help: help,
+            answer: answer,
+            confidence: confidence,
+            result: result,
+          };
+        }
+
+        function handleTool(params) {
+          var name = params.name;
+          var args = params.arguments || {};
+          var body = payload();
+          var row = bucket(body.itemId, cardCount(body));
+          if (args.itemId && args.itemId !== body.itemId) return fail("Unknown item.");
+          if (name === "learn_widget_state") {
+            document.getElementById("trace").textContent = "learn_widget_state";
+            return ok({ states: row.states, position: row.position });
+          }
+          if (name === "learn_widget_hint") {
+            var hinted = row.states[args.cardIndex] || { status: "open", help: "none" };
+            hinted.help = "hint";
+            hinted.hint = "Hold the data fixed, and let θ vary.";
+            row.states[args.cardIndex] = hinted;
+            document.getElementById("trace").textContent = "learn_widget_hint";
+            return { content: [{ type: "text", text: JSON.stringify({ hint: hinted.hint }) }] };
+          }
+          if (name === "learn_widget_answer" || name === "learn_widget_reveal") {
+            var card = cardAt(body, args.cardIndex);
+            if (!card) return fail("Unknown card.");
+            var help =
+              name === "learn_widget_reveal" ? "answer" : args.help === "hint" ? "hint" : "none";
+            var graded = grade(args, card, help);
+            row.states[args.cardIndex] = graded;
+            document.getElementById("trace").textContent =
+              name + " → " + graded.result.outcome + ", " + graded.result.rating;
+            return ok(graded);
+          }
+          if (name === "learn_widget_override") {
+            var current = row.states[args.cardIndex];
+            if (!current || !current.result) return fail("Grade the card first.");
+            if (["again", "hard", "good", "easy"].indexOf(args.rating) === -1)
+              return fail("Unknown rating.");
+            var next = JSON.parse(JSON.stringify(current));
+            next.result.rating = args.rating;
+            next.result.overridden = true;
+            row.states[args.cardIndex] = next;
+            document.getElementById("trace").textContent = "learn_widget_override → " + args.rating;
+            return ok(next);
+          }
+          if (name === "learn_widget_action") {
+            var message =
+              args.action === "snooze"
+                ? "Snoozed until " + ((body.summary && body.summary.snoozeUntil) || "later") + "."
+                : args.action === "start_concept"
+                  ? "Opening " + (args.conceptId || "the concept") + "."
+                  : args.action === "continue"
+                    ? "Continuing."
+                    : "";
+            if (!message) return fail("Unknown action.");
+            document.getElementById("trace").textContent = "learn_widget_action " + args.action;
+            return ok({ ok: true, message: message });
+          }
+          return fail("Unknown tool.");
+        }
+
+        function deliver() {
+          var body = payload();
+          store[body.itemId] = { states: [], position: 0 };
+          send({
+            jsonrpc: "2.0",
+            method: "ui/notifications/tool-input",
+            params: { arguments: { answerKey: "fixed", correctChoice: 0 } },
+          });
+          send({
+            jsonrpc: "2.0",
+            method: "ui/notifications/tool-result",
+            params: {
+              content: [{ type: "text", text: JSON.stringify(body) }],
+              structuredContent: body,
+            },
+          });
+          document.getElementById("trace").textContent = "tool-result " + body.widget;
+        }
+
+        window.addEventListener("message", function (event) {
+          if (event.source !== frame.contentWindow) return;
+          var msg = event.data;
+          if (!msg || msg.jsonrpc !== "2.0") return;
+          if (msg.method === "ui/initialize" && msg.id != null) {
+            booted = false;
+            var requested = msg.params && msg.params.protocolVersion;
+            send({
+              jsonrpc: "2.0",
+              id: msg.id,
+              result: {
+                protocolVersion: requested === PROTOCOL ? requested : PROTOCOL,
+                hostInfo: { name: "t3-code", version: "preview" },
+                hostCapabilities: {
+                  openLinks: {},
+                  serverTools: {},
+                  serverResources: {},
+                  logging: {},
+                  message: { text: {} },
+                  updateModelContext: { text: {}, structuredContent: {} },
+                  downloadFile: {},
+                  sandbox: {},
+                },
+                hostContext: context(),
+              },
+            });
+            return;
+          }
+          if (msg.method === "ui/notifications/initialized") {
+            if (booted) return;
+            booted = true;
+            deliver();
+            return;
+          }
+          if (msg.method === "ui/notifications/size-changed") {
+            var height = msg.params && msg.params.height;
+            if (typeof height === "number" && isFinite(height)) {
+              frame.style.height = Math.max(48, Math.ceil(height)) + "px";
+            }
+            return;
+          }
+          if (msg.method === "tools/call" && msg.id != null) {
+            try {
+              send({ jsonrpc: "2.0", id: msg.id, result: handleTool(msg.params || {}) });
+            } catch (err) {
+              send({
+                jsonrpc: "2.0",
+                id: msg.id,
+                error: {
+                  code: -32000,
+                  message: err && err.message ? err.message : "Request failed.",
+                },
+              });
+            }
+            return;
+          }
+          if (msg.method === "ping" && msg.id != null)
+            send({ jsonrpc: "2.0", id: msg.id, result: {} });
+        });
+
+        function paint() {
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.dataset.phone = phone ? "1" : "0";
+          document.getElementById("lead").innerHTML = leads[kind];
+          document.getElementById("hint").textContent =
+            "Answers containing “fixed” grade correct. Anything else is partial.";
+          document.getElementById("theme").textContent = theme === "dark" ? "Light" : "Dark";
+          document.getElementById("phone").textContent = phone ? "Thread" : "Phone";
+          document.getElementById("phone").setAttribute("aria-pressed", phone ? "true" : "false");
+          document.querySelectorAll(".seg button").forEach(function (button) {
+            button.setAttribute(
+              "aria-pressed",
+              button.getAttribute("data-kind") === kind ? "true" : "false",
+            );
+          });
+        }
+
+        function pushContext() {
+          paint();
+          if (!booted) return;
+          send({
+            jsonrpc: "2.0",
+            method: "ui/notifications/host-context-changed",
+            params: {
+              theme: theme,
+              styles: { variables: variables() },
+              containerDimensions: dimensions(),
+              platform: phone ? "mobile" : "web",
+            },
+          });
+        }
+
+        // Captured before reload mutates it. Inlined srcdoc still works from a file:// page.
+        var widgetHtml = frame.getAttribute("srcdoc") || "";
+
+        function reload() {
+          booted = false;
+          frame.style.height = "160px";
+          generation += 1;
+          if (widgetHtml.indexOf("<body") !== -1) {
+            frame.removeAttribute("src");
+            frame.srcdoc = widgetHtml.replace(
+              "</body>",
+              "<!-- preview " + generation + " --></body>",
+            );
+            return;
+          }
+          frame.src = "../src/learn-widget.html?preview=" + generation;
+        }
+
+        document.querySelectorAll(".seg button").forEach(function (button) {
+          button.addEventListener("click", function () {
+            kind = button.getAttribute("data-kind");
+            paint();
+            reload();
+          });
+        });
+        document.getElementById("theme").addEventListener("click", function () {
+          theme = theme === "dark" ? "light" : "dark";
+          pushContext();
+        });
+        document.getElementById("phone").addEventListener("click", function () {
+          phone = !phone;
+          pushContext();
+        });
+
+        paint();
+        reload();
+      })();
+    </script>
+  </body>
+</html>
