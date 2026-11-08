@@ -140,6 +140,9 @@ import { deriveLayout } from "./lib/layout";
 import { useNativeLayoutMetrics } from "./native/native-layout-metrics";
 import { isPresentedRoute } from "./native/workspace-stack-projection";
 import { workspaceDetailRouter } from "./features/layout/workspace/workspace-detail-selection";
+import { LearnMapScreen } from "./universal/LearnMapScreen";
+import { ChatSettingsScreen } from "./universal/settings/ChatSettingsScreen";
+import { LearnSettingsScreen } from "./universal/settings/LearnSettingsScreen";
 
 const settingsPage = (title: string) => pageRoute({ title, itemStyle: "standard" });
 
@@ -345,6 +348,17 @@ const SETTINGS_SCREENS = {
     screen: SettingsAuthRouteScreen,
     linking: "settings/waitlist",
     options: { headerShown: false, presentation: "modal" },
+  }),
+  // universal-seam:mobile-settings
+  SettingsChat: createNativeStackScreen({
+    screen: ChatSettingsScreen,
+    linking: "settings/assistant",
+    options: settingsPage("Assistant & Memory"),
+  }),
+  SettingsLearn: createNativeStackScreen({
+    screen: LearnSettingsScreen,
+    linking: "settings/tutor",
+    options: settingsPage("Tutor"),
   }),
 };
 
@@ -722,6 +736,12 @@ const RootStackConfig = createWorkspaceStackNavigator({
       screen: ConnectionsNewRouteScreen,
       linking: "connections/new",
       options: sheetRoute({ title: "Add Environment", detent: 0.55, maxDetent: 0.7 }),
+    }),
+    // universal-seam:mobile-learn
+    LearnMap: createNativeStackScreen({
+      screen: LearnMapScreen,
+      linking: "learn/map",
+      options: pageRoute({ title: "Knowledge map" }),
     }),
     NotFound: createNativeStackScreen({
       screen: NotFoundScreen,

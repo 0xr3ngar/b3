@@ -60,7 +60,15 @@
         "graphql.config.ts",
       ],
       // The generated operations export every selection's class.
-      "ignoreIssues": { "**/*.graphql.ts": ["exports", "types", "namespaceMembers"] },
+      // Fork modules export helpers and tools before every caller exists.
+      "ignoreIssues": {
+        "**/*.graphql.ts": ["exports", "types", "namespaceMembers"],
+        "src/universal/db/UniversalDb.ts": ["exports"],
+        "src/universal/learn/LearnService.ts": ["exports"],
+        "src/universal/mcp/tools.ts": ["exports"],
+        "src/universal/UniversalSettingsStore.ts": ["exports"],
+        "src/universal/UniversalWidgetPublisher.ts": ["exports"],
+      },
       // Keep the transitive Effect runtime pinned for standalone npm installs.
       // The Vite+ web build prerequisite.
       // Native and disk-loaded provider packages stay external to the bundle; the

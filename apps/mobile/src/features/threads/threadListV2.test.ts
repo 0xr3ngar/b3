@@ -19,6 +19,7 @@ import {
   CommandId,
   EnvironmentId,
   MessageId,
+  UNIVERSAL_SPACE_PROJECT_IDS,
   OrchestrationV2ThreadShell,
   ProjectId,
   ProviderInstanceId,
@@ -331,6 +332,42 @@ describe("getThreadListV2OrderedSection", () => {
 });
 
 describe("buildThreadListV2Items", () => {
+  it("keeps each space to its projects and hides Memory", () => {
+    const threads = [
+      makeThread({ id: ThreadId.make("repo"), title: "Repo", projectId: ProjectId.make("repo") }),
+      makeThread({
+        id: ThreadId.make("chat"),
+        title: "Chat",
+        projectId: UNIVERSAL_SPACE_PROJECT_IDS.chat,
+      }),
+      makeThread({
+        id: ThreadId.make("learn"),
+        title: "Learn",
+        projectId: UNIVERSAL_SPACE_PROJECT_IDS.learn,
+      }),
+      makeThread({
+        id: ThreadId.make("memory"),
+        title: "Memory",
+        projectId: UNIVERSAL_SPACE_PROJECT_IDS.memory,
+      }),
+    ];
+    const ids = (space: "code" | "chat" | "learn") =>
+      buildThreadListV2Items({
+        threads,
+        environmentId: null,
+        searchQuery: "",
+        now: NOW,
+        space,
+        ...(space === "chat"
+          ? { projectRefs: [{ environmentId, projectId: ProjectId.make("repo") }] }
+          : {}),
+      }).items.map((item) => item.thread.id);
+
+    expect(ids("code")).toEqual(["repo"]);
+    expect(ids("chat")).toEqual(["chat"]);
+    expect(ids("learn")).toEqual(["learn"]);
+  });
+
   it("hides snoozed threads and counts them — visibility parity with web", () => {
     const layout = buildThreadListV2Items({
       threads: [
