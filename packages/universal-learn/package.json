@@ -1,0 +1,43 @@
+{
+  "name": "@t3tools/universal-learn",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./fsrs": {
+      "types": "./src/fsrs.ts",
+      "import": "./src/fsrs.ts"
+    },
+    "./grading": {
+      "types": "./src/grading.ts",
+      "import": "./src/grading.ts"
+    },
+    "./graph": {
+      "types": "./src/graph.ts",
+      "import": "./src/graph.ts"
+    },
+    "./mastery": {
+      "types": "./src/mastery.ts",
+      "import": "./src/mastery.ts"
+    },
+    "./transit": {
+      "types": "./src/transit.ts",
+      "import": "./src/transit.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "effect-tsgo tsrs --noEmit",
+    "test": "vp test run --config ../../vite.config.ts --dir ."
+  },
+  "dependencies": {
+    "ts-fsrs": "6.0.0"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "@types/node": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
