@@ -27,6 +27,7 @@ export function toTransitInput(map: LearnMap): TransitInput {
       state: station.state,
       ...(station.recall === null ? {} : { recall: station.recall }),
       ...(station.misconception === null ? {} : { misconception: true }),
+      ...(station.note ? { note: station.note } : {}),
     })),
     edges: map.edges.map((edge) => ({
       from: edge.from,
@@ -34,6 +35,7 @@ export function toTransitInput(map: LearnMap): TransitInput {
       ...(edge.planned ? { planned: true } : {}),
     })),
     anchors: map.anchors,
+    ...(map.here === null ? {} : { here: map.here }),
   };
 }
 
