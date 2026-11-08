@@ -1113,6 +1113,14 @@ const make = Effect.gen(function* () {
   const modelFor = Effect.gen(function* () {
     const settings = yield* settingsStore.get;
     if (settings.learn.tutorModel !== null) return settings.learn.tutorModel;
+    // The model you last taught with beats a server default that may not be installed.
+    const recent = yield* threads
+      .listProjectThreads({ projectId: UNIVERSAL_SPACE_PROJECT_IDS.learn, includeSubagents: false })
+      .pipe(Effect.orElseSucceed(() => []));
+    const latest = recent
+      .filter((shell) => shell.modelSelection !== undefined && shell.modelSelection !== null)
+      .toSorted((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
+    if (latest?.modelSelection) return latest.modelSelection;
     const server = yield* serverSettings.getSettings.pipe(Effect.orElseSucceed(() => null));
     const fallback: ModelSelection | null =
       server?.defaultModelSelection ?? server?.textGenerationModelSelection ?? null;
