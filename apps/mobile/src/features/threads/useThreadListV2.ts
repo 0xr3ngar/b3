@@ -3,6 +3,7 @@ import type { EnvironmentId } from "@t3tools/contracts";
 import { useMemo, useSyncExternalStore } from "react";
 
 import { scopedProjectKey } from "../../lib/scopedEntities";
+import { threadBelongsToSpace } from "../../universal/spaceMembership";
 import { useOlderSettledShelf, useOlderSettledShelfGrowth } from "../../state/olderSettledShelf";
 import type { PendingNewTask } from "../../state/use-pending-new-tasks";
 import {
@@ -65,8 +66,20 @@ export function useThreadListV2(input: {
   readonly snoozedShelfExpanded: boolean;
   readonly settledShelfExpanded: boolean;
   readonly selectedThreadKey: string | null;
+  // universal-seam:mobile-space
+  readonly space?: LayoutInput["space"];
 }) {
-  const { threads, workingShelfEnabled } = input;
+  const { workingShelfEnabled } = input;
+  const space = input.space;
+  const sourceThreads = input.threads;
+  const threads = useMemo(
+    () =>
+      space === undefined
+        ? sourceThreads
+        : sourceThreads.filter((thread) => threadBelongsToSpace(thread.projectId, space)),
+    [sourceThreads, space],
+  );
+  const projectRefs = space === "chat" || space === "learn" ? null : input.projectRefs;
   const layoutTime = useMemo(
     () => threadListV2LayoutTime({ threads, now: input.now, searchQuery: input.searchQuery }),
     [threads, input.now, input.searchQuery],
@@ -119,10 +132,10 @@ export function useThreadListV2(input: {
     () =>
       olderSettledScopes({
         environmentId: input.environmentId,
-        projectRefs: input.projectRefs,
+        projectRefs,
         settlementEnvironmentIds: input.settlementEnvironmentIds,
       }),
-    [input.environmentId, input.projectRefs, input.settlementEnvironmentIds],
+    [input.environmentId, projectRefs, input.settlementEnvironmentIds],
   );
   const olderSettledShelf = useOlderSettledShelf({
     scopes,
@@ -137,7 +150,8 @@ export function useThreadListV2(input: {
         pendingOrder: input.pendingOrder,
         threads: threads.filter((thread) => thread.archivedAt === null),
         environmentId: input.environmentId,
-        projectRefs: input.projectRefs,
+        projectRefs,
+        space,
         searchQuery: input.searchQuery,
         matchedThreadKeys: new Set(input.searchMatches.keys()),
         settlementEnvironmentIds: input.settlementEnvironmentIds,
@@ -169,7 +183,8 @@ export function useThreadListV2(input: {
       input.pendingOrder,
       threads,
       input.environmentId,
-      input.projectRefs,
+      projectRefs,
+      space,
       input.searchQuery,
       input.searchMatches,
       input.settlementEnvironmentIds,
@@ -193,22 +208,21 @@ export function useThreadListV2(input: {
   const contentOnlyThreadKeys = useKeySet([...layout.contentOnlyThreadKeys].sort().join("\n"));
   const pendingTasks = useMemo(() => {
     const scopedProjectKeys =
-      input.projectRefs == null
+      projectRefs == null
         ? null
-        : new Set(
-            input.projectRefs.map((ref) => scopedProjectKey(ref.environmentId, ref.projectId)),
-          );
+        : new Set(projectRefs.map((ref) => scopedProjectKey(ref.environmentId, ref.projectId)));
     const searchQuery = input.searchQuery.trim().toLocaleLowerCase();
     return input.pendingTasks.filter(
       (pendingTask) =>
         (input.environmentId === null || pendingTask.environmentId === input.environmentId) &&
+        (space === undefined || threadBelongsToSpace(pendingTask.projectId, space)) &&
         (scopedProjectKeys === null ||
           scopedProjectKeys.has(
             scopedProjectKey(pendingTask.environmentId, pendingTask.projectId),
           )) &&
         (searchQuery.length === 0 || pendingTask.title.toLocaleLowerCase().includes(searchQuery)),
     );
-  }, [input.projectRefs, input.searchQuery, input.pendingTasks, input.environmentId]);
+  }, [projectRefs, space, input.searchQuery, input.pendingTasks, input.environmentId]);
   const items = useMemo(
     () =>
       buildThreadListV2ListItems({

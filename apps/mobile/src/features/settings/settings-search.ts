@@ -70,6 +70,9 @@ const SETTINGS_SEARCH_TERMS = {
     "thread behavior",
   ],
   SettingsFollowUp: ["follow-ups", "queue", "steer", "while the agent is running"],
+  // universal-seam:mobile-settings
+  SettingsChat: ["memory", "assistant", "embedding", "profile", "forget"],
+  SettingsLearn: ["tutor", "review", "retention", "knowledge"],
   SettingsArchive: ["archive", "archived", "restore", "unarchive"],
   SettingsProviderAccounts: [
     "provider accounts",

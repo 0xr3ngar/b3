@@ -17,6 +17,9 @@ export const SETTINGS_PAGE_TARGETS = [
   "SettingsKeyboard",
   "SettingsVoice",
   "SettingsFollowUp",
+  // universal-seam:mobile-settings
+  "SettingsChat",
+  "SettingsLearn",
   "SettingsScheduledTasks",
   "SettingsProjectGrouping",
   "SettingsClientStorage",

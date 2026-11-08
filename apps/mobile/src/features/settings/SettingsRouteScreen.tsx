@@ -271,6 +271,15 @@ function useSettingsIndexSections(): SettingsListSection[] {
         serverPage("SettingsWorktrees", "square.on.square", "Worktrees"),
       ],
     },
+    // universal-seam:mobile-settings
+    {
+      title: "Chat",
+      rows: [page("SettingsChat", "brain", "Assistant & Memory")],
+    },
+    {
+      title: "Learn",
+      rows: [page("SettingsLearn", "sparkles", "Tutor")],
+    },
     {
       rows: [
         serverPage("SettingsEnvironmentMaintenance", "arrow.clockwise", "Maintenance"),

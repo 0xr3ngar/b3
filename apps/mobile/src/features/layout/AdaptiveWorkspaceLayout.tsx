@@ -56,6 +56,8 @@ import {
 } from "../../lib/layout";
 import type { ThreadListFilters } from "../../persistence/mobile-preferences";
 import { appAtomRegistry } from "../../state/atom-registry";
+import { workspaceConnections } from "../../state/workspace";
+import { chatSpaceDraftTarget } from "../../universal/chatNewTask";
 import { useProjects } from "../../state/entities";
 import { environmentThreadShells } from "../../state/threads";
 import { withKnownPullRequestSummary } from "../../state/use-thread-pr";
@@ -624,6 +626,15 @@ function AdaptiveWorkspaceLayoutContent(
     Platform.OS === "android" && androidSettingsOpen && !layout.usesSplitView;
   // Reads the open page when pressed, so the layout context doesn't change on every navigation.
   const handleStartNewTask = () => {
+    // universal-seam:mobile-space
+    const chatDraft = chatSpaceDraftTarget({
+      environments: appAtomRegistry.get(workspaceConnections.environmentsAtom),
+      requestId: uuidv4(),
+    });
+    if (chatDraft) {
+      handleSelectThreadRoute(chatDraft);
+      return;
+    }
     const state = rootStackState(navigation);
     const currentRoute = workspaceRoutesOf(
       state?.routes.slice(0, state.index + 1) ?? [],

@@ -29,7 +29,12 @@ import {
   sortPinnedThreadsByOrderKey,
   sortSettledThreads,
 } from "@t3tools/client-runtime/state/thread-sort";
-import { isListedThreadLineage, type EnvironmentId, type ProjectId } from "@t3tools/contracts";
+import {
+  isListedThreadLineage,
+  type EnvironmentId,
+  type ProjectId,
+  type UniversalSpace,
+} from "@t3tools/contracts";
 import type { SnoozePresetSetting } from "@t3tools/contracts/settings";
 import type { MenuAction } from "@react-native-menu/menu";
 
@@ -38,6 +43,7 @@ import type { ThreadMoveAvailability } from "./threadOrder";
 
 import { relativeTime } from "../../lib/time";
 import type { PendingNewTask } from "../../state/use-pending-new-tasks";
+import { threadBelongsToSpace } from "../../universal/spaceMembership";
 
 import {
   applyPendingThreadOrder,
@@ -657,6 +663,8 @@ export function buildThreadListV2Items(input: {
     readonly environmentId: EnvironmentId;
     readonly projectId: ProjectId;
   }> | null;
+  // universal-seam:mobile-space
+  readonly space?: UniversalSpace;
   readonly searchQuery: string;
   readonly matchedThreadKeys?: ReadonlySet<string>;
   readonly settlementEnvironmentIds?: ReadonlySet<EnvironmentId>;
@@ -693,6 +701,7 @@ export function buildThreadListV2Items(input: {
   const projectKeys = input.projectRefs
     ? new Set(input.projectRefs.map((ref) => `${ref.environmentId}:${ref.projectId}`))
     : null;
+  const spaceScoped = input.space === "chat" || input.space === "learn";
 
   const workingShelfEnabled = input.workingShelfEnabled === true;
   const pinned: EnvironmentThreadShell[] = [];
@@ -707,7 +716,10 @@ export function buildThreadListV2Items(input: {
       thread.archivedAt === null &&
       isListedThreadLineage(thread.lineage) &&
       (input.environmentId === null || thread.environmentId === input.environmentId) &&
-      (projectKeys === null || projectKeys.has(`${thread.environmentId}:${thread.projectId}`)),
+      (input.space === undefined || threadBelongsToSpace(thread.projectId, input.space)) &&
+      (spaceScoped ||
+        projectKeys === null ||
+        projectKeys.has(`${thread.environmentId}:${thread.projectId}`)),
   );
   // The same matches as the command palette, typo fallback included. Only
   // listed threads are ranked: a hidden exact match must not turn typos off.

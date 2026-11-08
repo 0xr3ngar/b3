@@ -89,6 +89,8 @@ import { SwipeableScrollGateProvider, useSwipeableScrollGate } from "./thread-sw
 import { useFabScroll } from "./FabScrollContext";
 import { useWorkspaceTabs } from "../layout/workspace/WorkspaceTabsContext";
 import { ThreadListFilters } from "./ThreadListFilters";
+import { UniversalThreadListHeader } from "../../universal/UniversalThreadListHeader";
+import { useListSpace } from "../../universal/useSpace";
 
 interface HomeScreenProps {
   readonly projects: ReadonlyArray<EnvironmentProject>;
@@ -422,7 +424,8 @@ export function HomeScreen(props: HomeScreenProps) {
   const [settledVisibleCount, setSettledVisibleCount] = useState(
     THREAD_LIST_V2_SETTLED_INITIAL_COUNT,
   );
-  const settledResetKey = `${props.selectedEnvironmentId ?? "all"}:${v2ProjectScopeKey ?? "all"}:${props.searchQuery.trim()}`;
+  const space = useListSpace();
+  const settledResetKey = `${space ?? "pending"}:${props.selectedEnvironmentId ?? "all"}:${v2ProjectScopeKey ?? "all"}:${props.searchQuery.trim()}`;
   const [lastSettledResetKey, setLastSettledResetKey] = useState(settledResetKey);
   if (lastSettledResetKey !== settledResetKey) {
     setLastSettledResetKey(settledResetKey);
@@ -482,6 +485,8 @@ export function HomeScreen(props: HomeScreenProps) {
     snoozedShelfExpanded,
     settledShelfExpanded,
     selectedThreadKey,
+    // universal-seam:mobile-space
+    space,
   });
   // Called as `props.onSelectThread(...)`, the compiler would cache this handler on the whole
   // props object, which is new on every render of Home's parent.
@@ -671,10 +676,14 @@ export function HomeScreen(props: HomeScreenProps) {
     projectCount: props.projects.length,
   });
 
+  // universal-seam:mobile-space
+  const universalHeader = <UniversalThreadListHeader />;
+
   if (!hasAnyThreads) {
     return (
       <View className={containerClassName}>
         <ScreenContent surface={sidebarSurface ? "drawer" : "screen"}>
+          {universalHeader}
           <View
             className={cn(
               "flex-1 items-center justify-center px-8",
@@ -728,6 +737,7 @@ export function HomeScreen(props: HomeScreenProps) {
   const v2ListHeader = (
     <>
       {listHeader}
+      {universalHeader}
       {Platform.OS === "ios" && workspace ? (
         <ThreadListFilters
           gutter={sidebarSurface ? 8 : 0}
@@ -775,11 +785,9 @@ export function HomeScreen(props: HomeScreenProps) {
   if (Platform.OS === "android" && threadListV2Items.length === 0) {
     return (
       <ScreenContent surface="screen">
-        <View
-          className="flex-1 items-center justify-center px-4"
-          style={{ paddingBottom: insets.bottom }}
-        >
-          {v2ListEmpty}
+        <View className="flex-1" style={{ paddingBottom: insets.bottom }}>
+          {universalHeader}
+          <View className="flex-1 items-center justify-center px-4">{v2ListEmpty}</View>
         </View>
       </ScreenContent>
     );
