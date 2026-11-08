@@ -1036,6 +1036,15 @@ export const WINDOWS_SERVER_ASAR_UNPACK_GLOBS = [
   "**/*.so.*",
   "**/*.dylib",
 ] as const;
+// universal-seam:desktop-natives
+// Smart unpack keys on `.node`/`.so`/`.dylib`, so a `.so.<version>` library stays archived.
+// These packages are loaded by real path: sqlite-vector by node:sqlite, the rest by the embedder worker.
+export const UNIVERSAL_NATIVE_ASAR_UNPACK_GLOBS = [
+  "**/node_modules/@sqliteai/**/*",
+  "**/node_modules/onnxruntime-node/**/*",
+  // One glob covers sharp's `.node` loaders and sharp-libvips' versioned `.so.<major>`.
+  "**/node_modules/@img/sharp-*/**/*",
+] as const;
 // Keep sidecar exclusions aligned with the app; .bin symlinks are unused and unsupported by ASAR extraction.
 export const WINDOWS_SERVER_ASAR_IGNORE_GLOBS = [
   "**/node_modules/@cursor/sdk-*",
@@ -2799,7 +2808,13 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
     // Disable smart unpack so native packages' JS/metadata stay archived and avoid slowing NSIS with loose files.
     ...(platform === "win"
       ? { asar: { smartUnpack: false }, asarUnpack: [WINDOWS_NATIVE_ASAR_UNPACK_GLOB] }
-      : { asarUnpack: ["**/node_modules/@transcribe-cpp/**/*.{dylib,so,so.*}"] }),
+      : {
+          asarUnpack: [
+            "**/node_modules/@transcribe-cpp/**/*.{dylib,so,so.*}",
+            // universal-seam:desktop-natives
+            ...UNIVERSAL_NATIVE_ASAR_UNPACK_GLOBS,
+          ],
+        }),
     extraResources: [
       ...DESKTOP_EXTRA_RESOURCES,
       ...(platform === "linux" ? LINUX_CAPTURE_EXTRA_RESOURCES : []),
