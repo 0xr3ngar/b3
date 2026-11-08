@@ -19,6 +19,15 @@ const McpAppReference = Schema.Struct({
   prefersBorder: Schema.optionalKey(Schema.Boolean),
 });
 
+/** The widget's own payload rides in the result so the host can hand it to the card; it never holds answer keys. */
+const WidgetPayloadFields = {
+  widget: Schema.Literals(["check", "review", "session-end"]),
+  card: Schema.optionalKey(Schema.Unknown),
+  cards: Schema.optionalKey(Schema.Array(Schema.Unknown)),
+  title: Schema.optionalKey(Schema.String),
+  summary: Schema.optionalKey(Schema.Unknown),
+};
+
 const MemoryKindParam = Schema.Literals([
   "fact",
   "preference",
@@ -92,7 +101,7 @@ export const MemoryForgetTool = Tool.make("memory_forget", {
 export const MemoryNextBatchTool = Tool.make("memory_next_batch", {
   ...memoryShared,
   description: "Memory extraction only: the next batch of chat messages to read.",
-  parameters: Schema.Struct({}),
+  parameters: Tool.EmptyParams,
   success: Schema.Struct({
     done: Schema.Boolean,
     batchId: Schema.NullOr(Schema.String),
@@ -162,7 +171,7 @@ export const LearnMapReadTool = Tool.make("learn_map_read", {
   ...learnShared,
   description:
     "Read the learner's knowledge map: lines (topics), concepts with state (solid, learning, due, ready, locked, suggested), recall, misconceptions, prerequisites.",
-  parameters: Schema.Struct({}),
+  parameters: Tool.EmptyParams,
   success: Schema.Struct({
     here: Schema.NullOr(Schema.String),
     lines: Schema.Array(Schema.Struct({ id: Schema.String, title: Schema.String })),
@@ -243,6 +252,7 @@ export const LearnAskTool = Tool.make("learn_ask", {
   success: Schema.Struct({
     t3McpApp: McpAppReference,
     itemId: Schema.String,
+    ...WidgetPayloadFields,
     status: Schema.Literal("waiting_for_learner"),
     message: Schema.String,
   }),
@@ -303,6 +313,8 @@ export const LearnSessionEndTool = Tool.make("learn_session_end", {
   }),
   success: Schema.Struct({
     t3McpApp: McpAppReference,
+    itemId: Schema.String,
+    ...WidgetPayloadFields,
     snoozeUntil: Schema.NullOr(Schema.String),
     message: Schema.String,
   }),

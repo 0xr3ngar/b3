@@ -206,6 +206,7 @@ export const layerLearn = McpToolAccess.toLayer(LearnToolkit, {
       const reference = yield* publisher.publish({ threadId: thread.threadId, tool: "learn_ask" });
       if (reference === undefined) return yield* widgetUnavailable();
       return {
+        ...asked.payload,
         t3McpApp: reference,
         itemId: asked.itemId,
         status: "waiting_for_learner" as const,
@@ -264,7 +265,9 @@ export const layerLearn = McpToolAccess.toLayer(LearnToolkit, {
       const reference = yield* publisher.publish({ threadId: thread.threadId, tool: "learn_session_end" });
       if (reference === undefined) return yield* widgetUnavailable();
       return {
+        ...ended.payload,
         t3McpApp: reference,
+        itemId: ended.itemId,
         snoozeUntil: ended.snoozeUntil,
         message:
           ended.snoozeUntil === null

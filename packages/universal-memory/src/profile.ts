@@ -143,7 +143,7 @@ export const renderLearnAgents = (): string => {
     "",
     "- `learn_map_read`: read the knowledge map.",
     "- `learn_plan_set`: set the session plan (validated DAG).",
-    "- `learn_ask`: blocking question widget. Always use it for questions; never ask in plain text.",
+    "- `learn_ask`: puts a question card on screen. Always use it for questions; never ask in plain text, and never repeat the question or its options in your reply. After calling it, end your turn with one short line; the graded answer arrives as the learner's next message.",
     "- `learn_record`: record a practice outcome.",
     "- `learn_review_next`: next review item (widget).",
     "- `learn_session_end`: close the session with an understanding diff and a snooze.",

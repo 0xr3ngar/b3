@@ -64,7 +64,8 @@ export class EmbedderError extends Schema.TaggedError<EmbedderError>()("Embedder
   cause: Schema.optionalKey(Schema.Defect()),
 }) {
   override get message(): string {
-    return `Embedder ${this.operation} failed for ${this.modelId}.`;
+    const detail = this.cause instanceof Error ? ` ${this.cause.message}` : "";
+    return `Embedder ${this.operation} failed for ${this.modelId}.${detail}`;
   }
 }
 
@@ -141,6 +142,12 @@ export class Embedder extends Context.Service<
     readonly benchmark: () => Effect.Effect<EmbedderBenchmark, EmbedderError>;
   }
 >()("t3/universal/embedder/Embedder") {}
+
+const WORKER_RESPONSE_TYPES = new Set(["progress", "loaded", "vectors", "error"]);
+const isWorkerResponse = (message: unknown): message is EmbedderWorkerResponse =>
+  typeof message === "object" &&
+  message !== null &&
+  WORKER_RESPONSE_TYPES.has((message as { readonly type?: unknown }).type as string);
 
 const initialStatus = (modelId: string): EmbedderStatus => ({
   modelId,
@@ -289,6 +296,8 @@ export const layer = (options: EmbedderOptions) =>
         const exited = yield* Deferred.make<void>();
         loadWaiter = waiter;
         created.onMessage((message) => {
+          // Node's --watch mode posts its own dependency reports on the same port.
+          if (!isWorkerResponse(message)) return;
           Queue.offerUnsafe(events, { type: "message", message });
         });
         created.onError((cause) => {

@@ -143,6 +143,8 @@ describe("Embedder", () => {
 
       const first = yield* embedder.embed(["first memory"], "query").pipe(Effect.forkChild);
       assert.deepStrictEqual(yield* fake.take, { type: "load" });
+      // Node's --watch mode reports worker dependencies on the same port.
+      fake.respond({ "watch:import": ["file:///worker.ts"] } as never);
       fake.respond({ type: "loaded" });
       assert.deepStrictEqual(yield* fake.take, {
         type: "embed",

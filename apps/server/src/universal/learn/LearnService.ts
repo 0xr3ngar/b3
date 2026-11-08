@@ -178,7 +178,11 @@ export class LearnService extends Context.Service<
       readonly threadId: ThreadId;
       readonly itemId: string;
     }) => Effect.Effect<
-      { readonly states: ReadonlyArray<CardState>; readonly position: number },
+      {
+        readonly states: ReadonlyArray<CardState>;
+        readonly position: number;
+        readonly payload: LearnWidgetPayload;
+      },
       UniversalDb.UniversalDbError | LearnError
     >;
     readonly answer: (input: {
@@ -567,9 +571,26 @@ const make = Effect.gen(function* () {
     threadId,
     itemId,
   }) {
-    const { states } = yield* loadItem(threadId, itemId);
+    const { item, states } = yield* loadItem(threadId, itemId);
     const position = states.findIndex((state) => state.status === "open");
-    return { states: states.map(publicState), position: position === -1 ? states.length : position };
+    const payload = yield* db.use("learn.widgetPayload", (sqlite): LearnWidgetPayload => {
+      const row = sqlite.prepare("SELECT widget, payload_json FROM learn_items WHERE id = ?").get(itemId) as {
+        widget: string;
+        payload_json: string;
+      };
+      if (row.widget === "session-end") {
+        return { widget: "session-end", itemId, summary: parseJson<SessionSummary>(row.payload_json, {} as SessionSummary) };
+      }
+      const cards = item.cards.map((card) => toCard(sqlite, card));
+      return item.widget === "check"
+        ? { widget: "check", itemId, card: cards[0]! }
+        : { widget: "review", itemId, title: item.title, cards };
+    });
+    return {
+      states: states.map(publicState),
+      position: position === -1 ? states.length : position,
+      payload,
+    };
   });
 
   const writeStates = (itemId: string, states: ReadonlyArray<StoredCardState>) =>

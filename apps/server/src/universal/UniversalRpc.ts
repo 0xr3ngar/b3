@@ -30,7 +30,7 @@ const toUniversalError = (error: { readonly message: string }) =>
 
 const CardTarget = { itemId: Schema.String, cardIndex: Schema.Int };
 const WidgetArgs = {
-  learn_widget_state: Schema.Struct({ itemId: Schema.String }),
+  learn_widget_state: Schema.Struct({ itemId: Schema.optionalKey(Schema.String) }),
   learn_widget_answer: Schema.Struct({
     ...CardTarget,
     answer: Schema.Struct({
@@ -91,6 +91,16 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
           Effect.orElseSucceed(() => false),
         );
 
+  /** The Learn item id the tool result carried, read back from the stored turn item. */
+  const learnItemOfTurn = (input: McpAppCallToolInput) =>
+    orchestrator.getTurnItem({ threadId: input.threadId, itemId: input.itemId }).pipe(
+      Effect.map((item) => {
+        const output = item?.type === "dynamic_tool" ? JSON.stringify(item.output ?? null) : "";
+        return /"itemId\\?":\\?"((?:item|end)_[0-9a-f]{20})/.exec(output)?.[1] ?? null;
+      }),
+      Effect.orElseSucceed(() => null),
+    );
+
   const runWidgetTool = Effect.fn("UniversalRpc.runWidgetTool")(
     function* (input: McpAppCallToolInput) {
       const name = input.name as WidgetTool;
@@ -99,8 +109,12 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
       const args = decoded.value as never;
       const threadId = input.threadId;
       switch (name) {
-        case "learn_widget_state":
-          return toolResult(yield* learn.widgetState({ ...(args as { itemId: string }), threadId }));
+        case "learn_widget_state": {
+          const requested = (args as { itemId?: string }).itemId;
+          const learnItemId = requested ?? (yield* learnItemOfTurn(input));
+          if (learnItemId === null) return toolError("This card has no Learn item.");
+          return toolResult(yield* learn.widgetState({ itemId: learnItemId, threadId }));
+        }
         case "learn_widget_answer":
           return toolResult(yield* learn.answer({ ...(args as Parameters<typeof learn.answer>[0]), threadId }));
         case "learn_widget_hint":

@@ -27,6 +27,7 @@ export const run = Effect.gen(function* () {
     const profile = yield* memory.profile;
     yield* spaces.writeInstructions("chat", {
       agents: `${renderChatAgents({ profileBytes: byteLength(profile) })}\n\n${profile}\n`,
+      profile: `${profile}\n`,
     });
     yield* spaces.writeInstructions("learn", {
       agents: settings.learn.useMemoryProfile

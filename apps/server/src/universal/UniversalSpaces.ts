@@ -31,6 +31,7 @@ const SPACE_TITLES: Record<SpaceKey, string> = {
 
 export interface SpaceInstructions {
   readonly agents: string;
+  readonly profile?: string;
 }
 
 /**
@@ -125,6 +126,9 @@ const make = Effect.gen(function* () {
       yield* fileSystem.writeFileString(path.join(dir, "AGENTS.md"), files.agents);
       // Claude Code reads CLAUDE.md and follows @-imports; the other CLIs read AGENTS.md.
       yield* fileSystem.writeFileString(path.join(dir, "CLAUDE.md"), "@AGENTS.md\n");
+      if (files.profile !== undefined) {
+        yield* fileSystem.writeFileString(path.join(dir, "PROFILE.md"), files.profile);
+      }
     },
     (effect) =>
       effect.pipe(

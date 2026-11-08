@@ -2116,6 +2116,10 @@
           function (result) {
             if (result &amp;&amp; result.hostContext) applyContext(result.hostContext);
             notify("ui/notifications/initialized", {});
+            // Some providers store T3 tool results in a shape the host does not replay; ask the server.
+            invoke("learn_widget_state", {}, function (state) {
+              if (!payload &amp;&amp; state &amp;&amp; state.payload) acceptPayload(state.payload);
+            });
           },
           function () {
             errorText = "The host did not initialize.";

@@ -29,7 +29,10 @@ export type EmbedderWorkerResponse =
 
 const BATCH_SIZE = 16;
 
-const messageOf = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+const messageOf = (cause: unknown) =>
+  cause instanceof Error
+    ? cause.message || cause.stack?.split("\n").slice(0, 3).join(" ") || cause.name
+    : String(cause);
 
 const parent = NodeWorkerThreads.parentPort;
 if (parent === null) {
