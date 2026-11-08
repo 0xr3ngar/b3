@@ -33,7 +33,9 @@
     "pnpm-workspace.yaml": "allow-builds",
     "knip.jsonc": "knip-entries",
     "package.json": "scripts",
-    "apps/web/src/components/chat/DraftHeroHeadline.tsx": "space-hero"
+    "apps/web/src/components/chat/DraftHeroHeadline.tsx": "space-hero",
+    "apps/web/src/components/settings/SettingsScopeSentence.tsx": "settings-nav",
+    "apps/web/src/components/settings/SettingsSidebarNav.tsx": "settings-nav"
   },
   "patterns": {
     "apps/mobile/src/**": "mobile seams are marked universal-seam:mobile-*"
