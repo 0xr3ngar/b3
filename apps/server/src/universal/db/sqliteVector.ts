@@ -19,11 +19,34 @@ const isMusl = (platform: string) => {
   return report?.header?.glibcVersionRuntime === undefined;
 };
 
-/** The package's ESM entry cannot `require` its platform package, so resolve the binary directly. */
-export function resolveSqliteVectorPath(host: {
-  readonly platform: string;
-  readonly arch: string;
-}): { path: string } | { error: string } {
+/**
+ * pnpm nests the optional platform packages under the main one, so the bundle's
+ * own location cannot see them. Resolve through sqlite-vector, then fall back to
+ * the module itself for a hoisted install.
+ */
+const findPlatformPackageDir = (name: string, moduleUrl: string): string | null => {
+  const fromModule = NodeModule.createRequire(moduleUrl);
+  const anchors = [fromModule];
+  try {
+    anchors.push(NodeModule.createRequire(fromModule.resolve("@sqliteai/sqlite-vector")));
+  } catch {
+    // Without the main package, only a hoisted platform package is reachable.
+  }
+  for (const anchor of anchors) {
+    try {
+      return NodePath.dirname(anchor.resolve(`${name}/package.json`));
+    } catch {
+      continue;
+    }
+  }
+  return null;
+};
+
+export function resolveSqliteVectorPath(
+  host: { readonly platform: string; readonly arch: string },
+  /** Test seam: the module the platform package is resolved from. */
+  moduleUrl: string = import.meta.url,
+): { path: string } | { error: string } {
   const key = PLATFORM_PACKAGES[`${host.platform}-${host.arch}`];
   if (key === undefined) {
     return { error: `sqlite-vector has no build for ${host.platform}-${host.arch}.` };
@@ -35,16 +58,9 @@ export function resolveSqliteVectorPath(host: {
       : host.platform === "darwin"
         ? "vector.dylib"
         : "vector.so";
-  try {
-    const require = NodeModule.createRequire(import.meta.url);
-    const manifest = require.resolve(`${name}/package.json`);
-    // Electron serves unpacked natives from app.asar.unpacked.
-    const path = NodePath.join(NodePath.dirname(manifest), binary).replace(
-      `app.asar${NodePath.sep}`,
-      `app.asar.unpacked${NodePath.sep}`,
-    );
-    return NodeFS.existsSync(path) ? { path } : { error: `${name} is missing ${binary}.` };
-  } catch {
-    return { error: `${name} is not installed.` };
-  }
+  const directory = findPlatformPackageDir(name, moduleUrl);
+  if (directory === null) return { error: `${name} is not installed.` };
+  // Electron serves unpacked natives from <archive>.asar.unpacked.
+  const path = NodePath.join(directory, binary).replace(/(\.asar)([\\/])/, "$1.unpacked$2");
+  return NodeFS.existsSync(path) ? { path } : { error: `${name} is missing ${binary}.` };
 }

@@ -57,6 +57,7 @@ import {
   WindowsPackagedPayloadValidationError,
   stageCursorSdkPlatformPackages,
   WINDOWS_PACKAGED_PAYLOAD_FILE_LIMIT,
+  UNIVERSAL_NATIVE_ASAR_UNPACK_GLOBS,
   WINDOWS_SERVER_ASAR_IGNORE_GLOBS,
   WINDOWS_SERVER_ASAR_RESOURCE,
   WSL_RUNTIME_ARCHIVE_EXTRA_RESOURCE,
@@ -664,6 +665,28 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
       }),
     ),
   );
+
+  it("unpacks the fork's natives, including versioned shared libraries", () => {
+    const unpacks = (file: string) =>
+      UNIVERSAL_NATIVE_ASAR_UNPACK_GLOBS.some((glob) => NodePath.matchesGlob(file, glob));
+
+    assert.isTrue(unpacks("node_modules/@sqliteai/sqlite-vector-linux-x86_64/vector.so"));
+    assert.isTrue(unpacks("node_modules/@sqliteai/sqlite-vector-darwin-arm64/vector.dylib"));
+    assert.isTrue(unpacks("node_modules/@sqliteai/sqlite-vector-win32-x86_64/vector.dll"));
+    assert.isTrue(
+      unpacks("node_modules/onnxruntime-node/bin/napi-v6/linux/x64/libonnxruntime.so.1"),
+    );
+    assert.isTrue(unpacks("node_modules/onnxruntime-node/bin/napi-v6/win32/x64/onnxruntime.dll"));
+    assert.isTrue(
+      unpacks("node_modules/@img/sharp-libvips-linux-x64/lib/libvips-cpp.so.8.18.7"),
+      "a versioned shared library does not end in .so",
+    );
+    assert.isTrue(
+      unpacks("node_modules/@img/sharp-libvips-darwin-arm64/lib/libvips-cpp.8.18.7.dylib"),
+    );
+    assert.isTrue(unpacks("node_modules/@img/sharp-linux-x64/lib/sharp-linux-x64-0.35.5.node"));
+    assert.isFalse(unpacks("node_modules/onnxruntime-common/dist/index.js"));
+  });
 
   it("drops the other architecture's Darwin prebuilds from single-architecture Mac builds", () => {
     const excludes = (arch: "arm64" | "x64" | "universal", file: string) =>

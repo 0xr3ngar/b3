@@ -38,10 +38,55 @@ const CURSOR_RUNTIME_DEPENDENCIES = [
   "@fastify/busboy",
 ] as const;
 
+// universal-seam:native-externals
+// transformers loads tokenizers and onnxruntime by path, so its closure stays external with it.
+const UNIVERSAL_RUNTIME_DEPENDENCIES = [
+  "@huggingface/jinja",
+  "@huggingface/tokenizers",
+  "@img/",
+  "@protobufjs/",
+  "@types/node",
+  "adm-zip",
+  "boolean",
+  "define-data-property",
+  "define-properties",
+  "detect-libc",
+  "detect-node",
+  "es-define-property",
+  "es-errors",
+  "es6-error",
+  "escape-string-regexp",
+  "flatbuffers",
+  "global-agent",
+  "globalthis",
+  "gopd",
+  "guid-typescript",
+  "has-property-descriptors",
+  "json-stringify-safe",
+  "long",
+  "matcher",
+  "object-keys",
+  "platform",
+  "protobufjs",
+  "roarr",
+  "semver",
+  "semver-compare",
+  "serialize-error",
+  "sharp",
+  "sprintf-js",
+  "type-fest",
+  "undici-types",
+] as const;
+
+// A trailing slash means every package in the scope.
+const matchesDependency = (id: string, name: string) =>
+  id === name || id.startsWith(name.endsWith("/") ? name : `${name}/`);
+
 export function isRuntimeExternalCliDependency(id: string): boolean {
   return (
     CLI_RUNTIME_EXTERNAL_PREFIXES.some((prefix) => id.startsWith(prefix)) ||
-    CURSOR_RUNTIME_DEPENDENCIES.some((name) => id === name || id.startsWith(`${name}/`))
+    CURSOR_RUNTIME_DEPENDENCIES.some((name) => matchesDependency(id, name)) ||
+    UNIVERSAL_RUNTIME_DEPENDENCIES.some((name) => matchesDependency(id, name))
   );
 }
 
