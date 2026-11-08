@@ -27,7 +27,7 @@ import * as Schema from "effect/Schema";
 import * as Semaphore from "effect/Semaphore";
 import * as SqlClient from "effect/sql/SqlClient";
 import * as Stream from "effect/Stream";
-import type { DatabaseSync } from "node:sqlite";
+import type * as NodeSqlite from "node:sqlite";
 
 import * as Embedder from "../embedder/Embedder.ts";
 import * as UniversalDb from "../db/UniversalDb.ts";
@@ -258,12 +258,12 @@ const make = Effect.gen(function* () {
     );
   const notify = PubSub.publish(changesHub, undefined).pipe(Effect.asVoid);
 
-  const readRows = (sqlite: DatabaseSync, where: string, ...params: Array<string | number>) =>
+  const readRows = (sqlite: NodeSqlite.DatabaseSync, where: string, ...params: Array<string | number>) =>
     sqlite
       .prepare(`SELECT rowid, * FROM memories WHERE ${where}`)
       .all(...params) as unknown as ReadonlyArray<MemoryDbRow>;
 
-  const ensureVectorInit = (sqlite: DatabaseSync, dims: number) => {
+  const ensureVectorInit = (sqlite: NodeSqlite.DatabaseSync, dims: number) => {
     if (!db.vector.available || vectorDims === dims) return db.vector.available;
     sqlite
       .prepare("SELECT vector_init('memories', 'embedding', ?)")
@@ -272,7 +272,7 @@ const make = Effect.gen(function* () {
     return true;
   };
 
-  const ftsSearch = (sqlite: DatabaseSync, query: string, limit: number) => {
+  const ftsSearch = (sqlite: NodeSqlite.DatabaseSync, query: string, limit: number) => {
     const match = ftsQuery(query);
     if (match === null) {
       return readRows(
@@ -292,7 +292,7 @@ const make = Effect.gen(function* () {
   };
 
   const vectorNeighbours = (
-    sqlite: DatabaseSync,
+    sqlite: NodeSqlite.DatabaseSync,
     vector: Float32Array,
     embedderId: string,
     limit: number,

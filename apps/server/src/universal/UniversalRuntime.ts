@@ -39,8 +39,8 @@ export const run = Effect.gen(function* () {
   );
 
   let previous: UniversalSettings | null = null;
-  const apply = (settings: UniversalSettings) =>
-    Effect.gen(function* () {
+  const apply = Effect.fn("UniversalRuntime.apply")(
+    function* (settings: UniversalSettings) {
       yield* scheduler.sync(settings);
       if (previous === null || previous.chat.defaultModel !== settings.chat.defaultModel) {
         if (settings.chat.defaultModel !== null)
@@ -57,7 +57,10 @@ export const run = Effect.gen(function* () {
       }
       previous = settings;
       yield* render;
-    }).pipe(Effect.catchCause((cause) => Effect.logWarning("b3 settings apply failed", { cause })));
+    },
+    (effect) =>
+      effect.pipe(Effect.catchCause((cause) => Effect.logWarning("b3 settings apply failed", { cause }))),
+  );
 
   const initial = yield* settingsStore.get.pipe(Effect.orElseSucceed(() => null));
   if (initial !== null) {

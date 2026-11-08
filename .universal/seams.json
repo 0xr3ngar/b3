@@ -1,0 +1,31 @@
+{
+  "$comment": "Upstream files b3 edits. Everything else the fork adds is a new file. scripts/universal-seams.ts fails when an upstream file changes outside this list.",
+  "upstream": "origin/main",
+  "generated": ["apps/web/src/routeTree.gen.ts", "pnpm-lock.yaml"],
+  "seams": {
+    "packages/contracts/src/index.ts": "contracts-export",
+    "packages/contracts/src/rpc.ts": "rpc-group",
+    "apps/server/src/auth/RpcAuthorization.ts": "rpc-scopes",
+    "apps/server/src/observability/RpcInstrumentation.ts": "rpc-aggregates",
+    "apps/server/src/mcp/McpHttpServer.ts": "mcp-tools",
+    "apps/server/src/server.ts": "server-runtime",
+    "apps/server/src/ws.ts": "ws-handlers",
+    "apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts": "mcp-app-names",
+    "apps/server/package.json": "dependencies",
+    "packages/shared/src/toolOutput.ts": "mcp-app-names",
+    "packages/shared/src/t3McpToolPresentation.ts": "tool-labels",
+    "packages/client-runtime/src/t3ToolSummary.ts": "tool-labels",
+    "packages/client-runtime/src/mcpApps/host.ts": "mcp-app-accent",
+    "packages/client-runtime/package.json": "exports",
+    "apps/web/src/components/Sidebar.tsx": "sidebar-space",
+    "apps/web/src/components/settings/settingsSearch.ts": "settings-nav",
+    "apps/web/package.json": "dependencies",
+    "apps/mobile/package.json": "dependencies",
+    "apps/desktop/package.json": "native-unpack",
+    "FORK.md": "fork-docs",
+    "AGENTS.md": "fork-docs"
+  },
+  "patterns": {
+    "apps/mobile/src/**": "mobile seams are marked universal-seam:mobile-*"
+  }
+}

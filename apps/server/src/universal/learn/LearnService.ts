@@ -36,7 +36,7 @@ import * as SecureRandom from "effect/crypto/SecureRandom";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Schema from "effect/Schema";
-import type { DatabaseSync } from "node:sqlite";
+import type * as NodeSqlite from "node:sqlite";
 
 import * as ThreadLaunchService from "../../orchestration-v2/ThreadLaunchService.ts";
 import * as ThreadManagementService from "../../orchestration-v2/ThreadManagementService.ts";
@@ -264,25 +264,25 @@ const make = Effect.gen(function* () {
   const uuid = random.uuidV4().pipe(Effect.orDie);
   const newId = (prefix: string) => uuid.pipe(Effect.map((id) => `${prefix}_${id.replaceAll("-", "").slice(0, 20)}`));
 
-  const readConcepts = (sqlite: DatabaseSync) =>
+  const readConcepts = (sqlite: NodeSqlite.DatabaseSync) =>
     sqlite
       .prepare("SELECT id, title, claim, minutes, status, note, x, y FROM learn_concepts WHERE status != 'dismissed'")
       .all() as unknown as ReadonlyArray<ConceptRow>;
-  const readCards = (sqlite: DatabaseSync) =>
+  const readCards = (sqlite: NodeSqlite.DatabaseSync) =>
     new Map(
       (sqlite.prepare("SELECT * FROM learn_cards").all() as unknown as ReadonlyArray<CardRow>).map((row) => [
         row.concept_id,
         row,
       ]),
     );
-  const readEdges = (sqlite: DatabaseSync) =>
+  const readEdges = (sqlite: NodeSqlite.DatabaseSync) =>
     sqlite.prepare("SELECT from_id, to_id, planned FROM learn_edges").all() as unknown as ReadonlyArray<{
       from_id: string;
       to_id: string;
       planned: number;
     }>;
 
-  const ensureLine = (sqlite: DatabaseSync, title: string, at: string) => {
+  const ensureLine = (sqlite: NodeSqlite.DatabaseSync, title: string, at: string) => {
     const id = slugify(title);
     const existing = sqlite.prepare("SELECT id FROM learn_lines WHERE id = ?").get(id);
     if (existing === undefined) {
@@ -474,7 +474,7 @@ const make = Effect.gen(function* () {
     });
   });
 
-  const lineRef = (sqlite: DatabaseSync, conceptId: string): Card["line"] => {
+  const lineRef = (sqlite: NodeSqlite.DatabaseSync, conceptId: string): Card["line"] => {
     const row = sqlite
       .prepare(
         `SELECT l.id, l.title, l.color FROM learn_concept_lines c JOIN learn_lines l ON l.id = c.line_id
@@ -484,7 +484,7 @@ const make = Effect.gen(function* () {
     return row === undefined ? null : { id: row.id, name: row.title, color: row.color };
   };
 
-  const toCard = (sqlite: DatabaseSync, item: LearnItemInput): Card => {
+  const toCard = (sqlite: NodeSqlite.DatabaseSync, item: LearnItemInput): Card => {
     const concept = sqlite.prepare("SELECT title FROM learn_concepts WHERE id = ?").get(item.conceptId) as
       | { title: string }
       | undefined;
@@ -573,7 +573,7 @@ const make = Effect.gen(function* () {
     );
 
   const applyRating = (
-    sqlite: DatabaseSync,
+    sqlite: NodeSqlite.DatabaseSync,
     input: {
       readonly conceptId: string;
       readonly rating: "again" | "hard" | "good" | "easy";

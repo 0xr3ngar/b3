@@ -65,20 +65,18 @@ const make = Effect.gen(function* () {
     Effect.orElseSucceed(() => null),
   );
 
-  const existingTask = (key: string) =>
-    Effect.gen(function* () {
-      const id = yield* readKey(key);
-      if (id === null) return null;
-      const list = yield* tasks.list().pipe(Effect.orElseSucceed(() => ({ tasks: [] })));
-      return list.tasks.find((task) => task.id === id) ?? null;
-    });
+  const existingTask = Effect.fn("UniversalScheduler.existingTask")(function* (key: string) {
+    const id = yield* readKey(key);
+    if (id === null) return null;
+    const list = yield* tasks.list().pipe(Effect.orElseSucceed(() => ({ tasks: [] })));
+    return list.tasks.find((task) => task.id === id) ?? null;
+  });
 
-  const disable = (key: string) =>
-    Effect.gen(function* () {
-      const task = yield* existingTask(key);
-      if (task === null || !task.enabled) return;
-      yield* tasks.setEnabled({ id: task.id, enabled: false }).pipe(Effect.ignore);
-    });
+  const disable = Effect.fn("UniversalScheduler.disable")(function* (key: string) {
+    const task = yield* existingTask(key);
+    if (task === null || !task.enabled) return;
+    yield* tasks.setEnabled({ id: task.id, enabled: false }).pipe(Effect.ignore);
+  });
 
   const syncMemory = Effect.fn("UniversalScheduler.syncMemory")(function* (settings: UniversalSettings) {
     const interval = settings.chat.extractionInterval;

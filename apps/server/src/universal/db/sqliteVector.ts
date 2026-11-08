@@ -1,5 +1,5 @@
 // @effect-diagnostics nodeBuiltinImport:off - native extension resolution needs Node's module resolver.
-import { createRequire } from "node:module";
+import * as NodeModule from "node:module";
 import * as NodePath from "node:path";
 import * as NodeFS from "node:fs";
 
@@ -11,8 +11,8 @@ const PLATFORM_PACKAGES: Record<string, string> = {
   "win32-x64": "win32-x86_64",
 };
 
-const isMusl = () => {
-  if (process.platform !== "linux") return false;
+const isMusl = (platform: string) => {
+  if (platform !== "linux") return false;
   const report = process.report?.getReport() as
     | { readonly header?: { readonly glibcVersionRuntime?: string } }
     | undefined;
@@ -20,20 +20,23 @@ const isMusl = () => {
 };
 
 /** The package's ESM entry cannot `require` its platform package, so resolve the binary directly. */
-export function resolveSqliteVectorPath(): { path: string } | { error: string } {
-  const key = PLATFORM_PACKAGES[`${process.platform}-${process.arch}`];
+export function resolveSqliteVectorPath(host: {
+  readonly platform: string;
+  readonly arch: string;
+}): { path: string } | { error: string } {
+  const key = PLATFORM_PACKAGES[`${host.platform}-${host.arch}`];
   if (key === undefined) {
-    return { error: `sqlite-vector has no build for ${process.platform}-${process.arch}.` };
+    return { error: `sqlite-vector has no build for ${host.platform}-${host.arch}.` };
   }
-  const name = `@sqliteai/sqlite-vector-${key}${isMusl() ? "-musl" : ""}`;
+  const name = `@sqliteai/sqlite-vector-${key}${isMusl(host.platform) ? "-musl" : ""}`;
   const binary =
-    process.platform === "win32"
+    host.platform === "win32"
       ? "vector.dll"
-      : process.platform === "darwin"
+      : host.platform === "darwin"
         ? "vector.dylib"
         : "vector.so";
   try {
-    const require = createRequire(import.meta.url);
+    const require = NodeModule.createRequire(import.meta.url);
     const manifest = require.resolve(`${name}/package.json`);
     // Electron serves unpacked natives from app.asar.unpacked.
     const path = NodePath.join(NodePath.dirname(manifest), binary).replace(

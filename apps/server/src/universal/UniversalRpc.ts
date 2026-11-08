@@ -52,6 +52,9 @@ const WidgetArgs = {
   }),
 } as const;
 type WidgetTool = keyof typeof WidgetArgs;
+const decodeWidgetArgs = Object.fromEntries(
+  Object.entries(WidgetArgs).map(([name, schema]) => [name, Schema.decodeUnknownOption(schema)]),
+) as { readonly [K in WidgetTool]: (input: unknown) => ReturnType<ReturnType<typeof Schema.decodeUnknownOption>> };
 const isWidgetTool = (name: string): name is WidgetTool => Object.hasOwn(WidgetArgs, name);
 const WIDGET_APP_TOOLS = new Set(["learn_ask", "learn_session_end"]);
 
@@ -87,10 +90,10 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
           Effect.orElseSucceed(() => false),
         );
 
-  const runWidgetTool = (input: McpAppCallToolInput) =>
-    Effect.gen(function* () {
+  const runWidgetTool = Effect.fn("UniversalRpc.runWidgetTool")(
+    function* (input: McpAppCallToolInput) {
       const name = input.name as WidgetTool;
-      const decoded = Schema.decodeUnknownOption(WidgetArgs[name])(input.arguments);
+      const decoded = decodeWidgetArgs[name](input.arguments);
       if (decoded._tag === "None") return toolError("Invalid arguments for this Learn card.");
       const args = decoded.value as never;
       const threadId = input.threadId;
@@ -116,7 +119,9 @@ export const makeUniversalWsHandlers = Effect.gen(function* () {
             yield* learn.widgetAction({ threadId, ...(args as Parameters<typeof learn.widgetAction>[0]) }),
           );
       }
-    }).pipe(Effect.catch((error) => Effect.succeed(toolError(error.message))));
+    },
+    (effect) => effect.pipe(Effect.catch((error) => Effect.succeed(toolError(error.message)))),
+  );
 
   const status = Effect.gen(function* () {
     const stats = yield* memory.stats;
