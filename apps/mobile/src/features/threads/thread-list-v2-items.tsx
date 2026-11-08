@@ -61,6 +61,7 @@ import {
 import { useThreadPr } from "../../state/use-thread-pr";
 import { useSwipeRowDormant } from "../home/swipe-row-activation";
 import { ThreadSwipeable } from "../home/thread-swipe-actions";
+import { learnThisMenuAction, useLearnThisThread } from "../../universal/learnThis";
 import { buildThreadTitleRegenerationMenuItems } from "./thread-title-regeneration-menu";
 import { canTurnThreadIntoProject, turnThreadIntoProject } from "./turnThreadIntoProject";
 import { threadCanArchive } from "../home/threadArchive";
@@ -708,6 +709,8 @@ export const ThreadListV2Row = memo(function ThreadListV2Row(props: {
     onMoveThread,
   } = props;
   const snoozedRow = props.snoozed === true;
+  // universal-seam:learn-this
+  const learnThis = useLearnThisThread();
   const pinnedRow = props.pinned === true;
   const dormant = useSwipeRowDormant(props.activationKey);
 
@@ -912,6 +915,8 @@ export const ThreadListV2Row = memo(function ThreadListV2Row(props: {
   const menuActions = useMemo<MenuAction[]>(() => {
     const nested = Platform.OS === "ios";
     const direct: MenuAction[] = [
+      // universal-seam:learn-this
+      ...learnThisMenuAction(thread.projectId),
       ...(thread.branch
         ? [
             {
@@ -991,10 +996,16 @@ export const ThreadListV2Row = memo(function ThreadListV2Row(props: {
     snoozedRow,
     swipeActions.secondary,
     thread.branch,
+    thread.projectId,
     titleMenuItems,
   ]);
   const handleMenuAction = useCallback(
     ({ nativeEvent }: { readonly nativeEvent: { readonly event: string } }) => {
+      // universal-seam:learn-this
+      if (nativeEvent.event === "learn-this") {
+        void learnThis(thread);
+        return;
+      }
       if (nativeEvent.event === "new-thread-on-branch") onNewThreadOnBranch(thread);
       if (nativeEvent.event === "settle") handleSettle();
       if (nativeEvent.event === "unsettle") handleUnsettle();
@@ -1043,6 +1054,7 @@ export const ThreadListV2Row = memo(function ThreadListV2Row(props: {
       }
     },
     [
+      learnThis,
       onNewThreadOnBranch,
       thread,
       handleArchive,

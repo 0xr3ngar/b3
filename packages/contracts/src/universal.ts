@@ -34,6 +34,10 @@ export const universalSpaceOfProject = (projectId: string): UniversalSpace | "sy
   return "code";
 };
 
+/** Learn threads are already lessons. Code and Chat threads can start one. */
+export const canOfferLearnThis = (projectId: string | null | undefined): boolean =>
+  projectId != null && universalSpaceOfProject(projectId) !== "learn";
+
 export const MemoryKind = Schema.Literals([
   "fact",
   "preference",
@@ -262,10 +266,9 @@ export type UniversalWsMethod = (typeof UNIVERSAL_WS_METHODS)[keyof typeof UNIVE
 
 /** One label for every fork method, for exhaustive per-method maps upstream keeps. */
 export const universalRpcLabels = <const L extends string>(label: L) =>
-  Object.fromEntries(Object.values(UNIVERSAL_WS_METHODS).map((method) => [method, label])) as Record<
-    UniversalWsMethod,
-    L
-  >;
+  Object.fromEntries(
+    Object.values(UNIVERSAL_WS_METHODS).map((method) => [method, label]),
+  ) as Record<UniversalWsMethod, L>;
 
 export const UniversalRpcGroup = RpcGroup.make(
   Rpc.make(UNIVERSAL_WS_METHODS.getStatus, {

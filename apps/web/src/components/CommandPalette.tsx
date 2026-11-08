@@ -77,6 +77,7 @@ import {
   TextSearchIcon,
   UserPlusIcon,
 } from "lucide-react";
+import { useUniversalPaletteItems } from "../universal/paletteItems";
 import { openThreadFind } from "./chat/threadFindStore";
 import {
   useDeferredValue,
@@ -467,6 +468,8 @@ function OpenCommandPaletteDialog(props: {
   const availableSettingsSearchItems = useAvailableSettingsSearchItems();
   const { activeDraftThread, activeThread, defaultProjectRef, handleNewThread } =
     useHandleNewThread();
+  // universal-seam:learn-this
+  const universalPaletteItems = useUniversalPaletteItems(activeThread);
   const paletteRouteTarget = useThreadRouteTarget();
   const projects = useProjects();
   const referenceThreadRef =
@@ -1688,6 +1691,9 @@ function OpenCommandPaletteDialog(props: {
       },
     });
   }
+
+  // universal-seam:learn-this
+  actionItems.push(...universalPaletteItems);
 
   const rootGroups = buildRootGroups({ actionItems, recentThreadItems });
   // Every setting goes to the palette's own matcher, so settings get the same

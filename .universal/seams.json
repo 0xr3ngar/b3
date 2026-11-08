@@ -1,10 +1,7 @@
 {
   "$comment": "Upstream files b3 edits. Everything else the fork adds is a new file. scripts/universal-seams.ts fails when an upstream file changes outside this list.",
   "upstream": "origin/main",
-  "generated": [
-    "apps/web/src/routeTree.gen.ts",
-    "pnpm-lock.yaml"
-  ],
+  "generated": ["apps/web/src/routeTree.gen.ts", "pnpm-lock.yaml"],
   "seams": {
     "packages/contracts/src/index.ts": "contracts-export",
     "packages/contracts/src/rpc.ts": "rpc-group",
@@ -38,7 +35,9 @@
     "package.json": "scripts",
     "apps/web/src/components/chat/DraftHeroHeadline.tsx": "space-hero",
     "apps/web/src/components/settings/SettingsScopeSentence.tsx": "settings-nav",
-    "apps/web/src/components/settings/SettingsSidebarNav.tsx": "settings-nav"
+    "apps/web/src/components/settings/SettingsSidebarNav.tsx": "settings-nav",
+    "apps/web/src/hooks/useThreadActionMenu.ts": "learn-this",
+    "apps/web/src/components/CommandPalette.tsx": "learn-this"
   },
   "patterns": {
     "apps/mobile/src/**": "mobile seams are marked universal-seam:mobile-*"
